@@ -1897,24 +1897,24 @@ document.addEventListener('click', (e) => {
 });
 
 function addSearchedCity(cityData) {
-    // Add to CITIES config dynamically
+    const cityName = cityData.name.split(',')[0];
+    // Add to CITIES config dynamically with correct country code
     CITIES[cityData.key] = {
         name: cityData.name,
-        cc: cityData.cc,
-        lat: cityData.lat, lng: cityData.lng, zoom: cityData.zoom,
-        waqiId: cityData.waqiId,
-        focus: cityData.focus,
-        pop: cityData.pop, ndvi: cityData.ndvi, traffic: cityData.traffic,
+        cc: cityData.cc || 'un',
+        lat: cityData.lat, lng: cityData.lng, zoom: cityData.zoom || 12,
+        focus: cityData.focus || 'Global Monitoring',
+        pop: cityData.pop || 'N/A', ndvi: cityData.ndvi || 0.35, traffic: cityData.traffic || 60,
         color: 'var(--cyan)',
         heatZones: [
             { lat: cityData.lat, lng: cityData.lng, r: 800, c: '#ff9f1c', o: 0.25 },
             { lat: cityData.lat + 0.01, lng: cityData.lng + 0.01, r: 500, c: '#ff3560', o: 0.2 }
         ],
         waterPoints: [
-            { lat: cityData.lat + 0.005, lng: cityData.lng - 0.005, label: cityData.name.split(',')[0] + ' Water Monitor', ph: (6.5 + Math.random()*1.5).toFixed(1) }
+            { lat: cityData.lat + 0.005, lng: cityData.lng - 0.005, label: cityName + ' Water Monitor', ph: (6.5 + Math.random()*1.5).toFixed(1) }
         ],
         vegZones: [
-            { lat: cityData.lat - 0.01, lng: cityData.lng - 0.01, r: 500, label: cityData.name.split(',')[0] + ' Green Zone' }
+            { lat: cityData.lat - 0.01, lng: cityData.lng - 0.01, r: 500, label: cityName + ' Green Zone' }
         ]
     };
 
@@ -1964,21 +1964,25 @@ async function fetchCityAQI(key) {
         liveAQI[key] = data;
     }
     updateDashboardForCity();
+    updateCompChart();
     updateMapMarkers();
 }
 
 function rebuildCityButtons() {
     const selector = document.getElementById('city-selector');
     selector.innerHTML = '';
+    const accentColors = ['#00d4ff', '#00e87b', '#ff9f1c', '#a855f7', '#ff3560', '#14b8a6'];
     activeCityKeys.forEach((key, i) => {
         const city = CITIES[key];
         if (!city) return;
         const btn = document.createElement('div');
         btn.className = 'city-btn' + (key === activeCity ? ' active' : '');
         btn.dataset.city = key;
+        const accent = accentColors[i % accentColors.length];
         
-        // Preserve custom SVG for original cities, or use nicely styled FlagCDN for dynamic ones
-        let flagHtml = city.flagSvg ? city.flagSvg : `<img src="https://flagcdn.com/w40/${city.cc}.png" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:2px solid ${i===0?'#00d4ff':i===1?'#00e87b':'#ff9f1c'};">`;
+        // Always use real FlagCDN flag based on country code for correct icons
+        const cc = city.cc || 'un';
+        let flagHtml = `<img src="https://flagcdn.com/w80/${cc}.png" onerror="this.src='https://flagcdn.com/w80/un.png'" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:2px solid ${accent};">`;
 
         btn.innerHTML = `
             <div class="city-flag">${flagHtml}</div>
