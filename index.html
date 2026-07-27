@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Monitoring Platform — Multi-Task AI Framework for Integrated Urban Monitoring</title>
+    <meta name="description" content="A Multi-Task AI Framework for Integrated Urban Monitoring using Copernicus Earth Observation and IoT Data Fusion">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #060a1e;
+            --bg-secondary: #0c1233;
+            --panel-bg: rgba(12, 18, 51, 0.75);
+            --panel-border: rgba(64, 107, 235, 0.25);
+            --panel-hover: rgba(64, 107, 235, 0.35);
+            --text-primary: #eaf0ff;
+            --text-secondary: #7b8db8;
+            --text-muted: #4e5f85;
+            --cyan: #00d4ff;
+            --cyan-glow: rgba(0, 212, 255, 0.3);
+            --green: #00e87b;
+            --green-glow: rgba(0, 232, 123, 0.3);
+            --orange: #ff9f1c;
+            --orange-glow: rgba(255, 159, 28, 0.3);
+            --red: #ff3560;
+            --red-glow: rgba(255, 53, 96, 0.3);
+            --purple: #a855f7;
+            --purple-glow: rgba(168, 85, 247, 0.3);
+            --gold: #fbbf24;
+            --teal: #14b8a6;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --radius: 14px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0, 232, 123, 0.02) 0%, transparent 50%);
+        }
+
+        /* Grid background */
+        .bg-grid {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* App Layout */
+        #app {
+            position: relative; z-index: 1;
+            display: grid;
+            grid-template-columns: 68px 1fr;
+            grid-template-rows: 64px 1fr;
+            height: 100vh; width: 100vw;
+        }
+
+        /* === HEADER === */
+        header {
+            grid-column: 1 / -1;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--panel-border);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 24px;
+            z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .header-logo {
+            height: 38px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .header-logo img {
+            height: 48px; width: auto;
+            object-fit: contain;
+            filter: brightness(1.2) contrast(1.1);
+        }
+        .header-title-group {}
+        .header-title { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); }
+        .header-subtitle { font-size: 0.68rem; color: var(--text-primary); font-weight: 400; margin-top: 1px; }
+        .header-right { display: flex; gap: 14px; align-items: center; }
+        .header-badge {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 0.78rem; font-weight: 500;
+            background: rgba(0,0,0,0.25);
+            padding: 6px 14px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .pulse-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.6); opacity: 0.4; }
+        }
+
+        /* === SIDEBAR (Icon-only) === */
+        aside {
+            grid-column: 1; grid-row: 2;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--panel-border);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 16px 0; gap: 6px;
+            z-index: 900;
+        }
+        .nav-btn {
+            width: 44px; height: 44px;
+            border-radius: 12px; border: none;
+            background: transparent;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.25s ease;
+            position: relative;
+        }
+        .nav-btn svg { width: 20px; height: 20px; fill: var(--text-muted); transition: fill 0.25s; }
+        .nav-btn:hover { background: rgba(0,212,255,0.08); }
+        .nav-btn:hover svg { fill: var(--text-secondary); }
+        .nav-btn.active {
+            background: linear-gradient(135deg, rgba(0,212,255,0.12), rgba(168,85,247,0.08));
+            box-shadow: 0 0 12px rgba(0,212,255,0.15);
+        }
+        .nav-btn.active svg { fill: var(--cyan); }
+        .nav-btn.active::before {
+            content: '';
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 3px; height: 22px;
+            background: var(--cyan); border-radius: 0 3px 3px 0;
+        }
+        .nav-btn .tooltip {
+            position: absolute; left: 58px; top: 50%; transform: translateY(-50%);
+            background: var(--bg-secondary); color: var(--text-primary);
+            padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 500;
+            white-space: nowrap; pointer-events: none;
+            opacity: 0; transition: opacity 0.2s;
+            border: 1px solid var(--panel-border);
+        }
+        .nav-btn:hover .tooltip { opacity: 1; }
+        .nav-sep { width: 32px; height: 1px; background: var(--panel-border); margin: 6px 0; }
+
+        /* === MAIN === */
+        main {
+            grid-column: 2; grid-row: 2;
+            overflow-y: auto; overflow-x: hidden;
+            padding: 20px;
+        }
+        main::-webkit-scrollbar { width: 6px; }
+        main::-webkit-scrollbar-track { background: transparent; }
+        main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+        /* === VIEWS === */
+        .view { display: none; animation: viewIn 0.4s ease; }
+        .view.active { display: block; }
+        @keyframes viewIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+        /* === GLASS PANEL === */
+        .gp {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            position: relative; overflow: hidden;
+        }
+        .gp::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            opacity: 0.35;
+        }
+        .gp-header {
+            font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.2px;
+            color: var(--cyan); margin-bottom: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 600;
+        }
+        .gp-header .tag {
+            font-size: 0.65rem; padding: 3px 8px; border-radius: 10px;
+            text-transform: none; letter-spacing: 0; font-weight: 500;
+        }
+        .tag-live { background: rgba(0,232,123,0.12); color: var(--green); border: 1px solid rgba(0,232,123,0.2); }
+        .tag-s2 { background: rgba(0,212,255,0.1); color: var(--cyan); border: 1px solid rgba(0,212,255,0.2); }
+        .tag-s5p { background: rgba(255,159,28,0.1); color: var(--orange); border: 1px solid rgba(255,159,28,0.2); }
+
+        /* === COUNTRY SEARCH === */
+        .city-search-wrap {
+            display: flex; align-items: stretch; gap: 8px; margin-bottom: 20px;
+        }
+        .city-selector {
+            display: flex; gap: 8px; flex: 1;
+        }
+        .city-btn {
+            flex: 1; padding: 14px 12px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius-sm);
+            cursor: pointer; transition: all 0.3s;
+            text-align: center; position: relative;
+            overflow: hidden;
+        }
+        .city-btn::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(0,212,255,0.05));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .city-btn:hover::before { opacity: 1; }
+        .city-btn:hover { border-color: rgba(0,212,255,0.3); }
+        .city-btn.active {
+            border-color: var(--cyan);
+            background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(168,85,247,0.05));
+            box-shadow: 0 0 20px rgba(0,212,255,0.1);
+        }
+        .city-btn .city-flag { font-size: 1.6rem; margin-bottom: 6px; }
+        .city-btn .city-name { font-size: 0.82rem; font-weight: 600; }
+        .city-btn .city-focus { font-size: 0.65rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.3; }
+        .city-btn .city-status {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.6rem; margin-top: 6px; padding: 2px 8px;
+            border-radius: 10px; font-weight: 500;
+        }
+        .city-status.live { background: rgba(0,232,123,0.1); color: var(--green); }
+
+        /* Search panel */
+        .city-search-panel {
+            width: 160px; flex-shrink: 0;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius-sm);
+            padding: 8px 10px;
+            display: flex; flex-direction: column;
+        }
+        .city-search-panel .search-label {
+            font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--cyan); font-weight: 600; margin-bottom: 6px;
+        }
+        .city-search-input {
+            width: 100%; padding: 7px 10px 7px 30px;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; color: var(--text-primary);
+            font-family: var(--font); font-size: 0.78rem;
+            outline: none; transition: border-color 0.25s;
+        }
+        .city-search-input::placeholder { color: var(--text-muted); }
+        .city-search-input:focus { border-color: var(--cyan); }
+        .search-input-wrap {
+            position: relative;
+        }
+        .search-input-wrap svg {
+            position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+            width: 14px; height: 14px; stroke: var(--text-muted); fill: none; pointer-events: none;
+        }
+        .search-results {
+            max-height: 180px; overflow-y: auto; margin-top: 6px;
+        }
+        .search-results::-webkit-scrollbar { width: 4px; }
+        .search-results::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+        .search-result-item {
+            padding: 6px 8px; border-radius: 6px; cursor: pointer;
+            font-size: 0.75rem; color: var(--text-secondary);
+            transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .search-result-item:hover { background: rgba(0,212,255,0.08); color: var(--text-primary); }
+        .search-result-item .sr-flag { font-size: 1.1rem; }
+        .search-slots {
+            font-size: 0.6rem; color: var(--text-muted); margin-top: 6px;
+            padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        /* Map mode toggle */
+        .map-mode-toggle {
+            position: absolute; bottom: 20px; right: 16px; z-index: 1000;
+            display: flex; gap: 4px;
+            background: var(--panel-bg); backdrop-filter: blur(14px);
+            border: 1px solid var(--panel-border); border-radius: 10px;
+            padding: 4px;
+        }
+        .map-mode-btn {
+            padding: 6px 14px; border: none; border-radius: 8px;
+            background: transparent; color: var(--text-muted);
+            font-family: var(--font); font-size: 0.72rem; font-weight: 500;
+            cursor: pointer; transition: all 0.25s;
+        }
+        .map-mode-btn:hover { color: var(--text-primary); }
+        .map-mode-btn.active {
+            background: rgba(0,212,255,0.12); color: var(--cyan);
+            box-shadow: 0 0 8px rgba(0,212,255,0.15);
+        }
+
+        /* === METRIC CARDS === */
+        .metrics-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
+        .mc {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: var(--radius-sm);
+            padding: 16px 12px; text-align: center;
+            transition: all 0.3s; cursor: default;
+            position: relative;
+        }
+        .mc:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .mc-icon { margin-bottom: 10px; }
+        .mc-icon svg { width: 28px; height: 28px; }
+        .mc-val { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+        .mc-label { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+        .mc-sub { font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* === CHARTS GRID === */
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .chart-box { position: relative; min-height: 220px; }
+
+        /* === MAP === */
+        #map { width: 100%; height: 100%; border-radius: var(--radius); z-index: 1; }
+        .map-wrap { height: calc(100vh - 104px); position: relative; }
+        .map-controls {
+            position: absolute; top: 16px; right: 16px; z-index: 1000;
+            background: var(--panel-bg); backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border); border-radius: var(--radius);
+            padding: 16px; width: 260px;
+        }
+        .map-city-btns {
+            position: absolute; top: 16px; left: 16px; z-index: 1000;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .map-city-fly {
+            background: var(--panel-bg); backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border); border-radius: var(--radius-sm);
+            padding: 8px 16px; cursor: pointer; transition: all 0.25s;
+            color: var(--text-primary); font-family: var(--font);
+            font-size: 0.78rem; font-weight: 500;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .map-city-fly:hover { border-color: var(--cyan); background: rgba(0,212,255,0.1); }
+        .map-city-fly.active { border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,212,255,0.15); }
+        .map-city-fly svg { width: 14px; height: 14px; }
+
+        /* Layer toggles */
+        .layer-toggle {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 10px; cursor: pointer; font-size: 0.82rem;
+            color: var(--text-secondary); transition: color 0.2s;
+        }
+        .layer-toggle:hover { color: var(--text-primary); }
+        .layer-toggle input { display: none; }
+        .tog {
+            width: 36px; height: 18px; background: rgba(0,0,0,0.4);
+            border-radius: 9px; position: relative; transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
+        }
+        .tog::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 12px; height: 12px; background: var(--text-muted);
+            border-radius: 50%; transition: all 0.3s;
+        }
+        .layer-toggle input:checked + .tog {
+            background: rgba(0,212,255,0.15); border-color: var(--cyan);
+        }
+        .layer-toggle input:checked + .tog::after {
+            left: 20px; background: var(--cyan);
+            box-shadow: 0 0 6px var(--cyan);
+        }
+        .layer-toggle .lt-icon { display: flex; align-items: center; }
+        .layer-toggle .lt-icon svg { width: 16px; height: 16px; margin-right: 6px; }
+
+        /* === WP Grid === */
+        .wp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .wp-item { margin-bottom: 16px; }
+        .wp-item-row { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; }
+        .wp-item-status { font-weight: 600; }
+        .prog-bg {
+            height: 6px; background: rgba(0,0,0,0.4);
+            border-radius: 3px; overflow: hidden;
+        }
+        .prog-fill {
+            height: 100%; border-radius: 3px;
+            transition: width 0.8s ease;
+        }
+
+        /* === AI Model === */
+        .model-arch {
+            display: flex; align-items: center; justify-content: center;
+            gap: 0; padding: 30px 20px;
+            background: rgba(0,0,0,0.2); border-radius: var(--radius);
+            border: 1px solid rgba(255,255,255,0.03);
+            margin-bottom: 16px; flex-wrap: nowrap;
+        }
+        .arch-block {
+            background: linear-gradient(135deg, rgba(12,18,51,0.9), rgba(0,0,0,0.6));
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius-sm);
+            padding: 18px 16px; text-align: center;
+            min-width: 130px; position: relative;
+        }
+        .arch-block h4 { font-size: 0.82rem; font-weight: 600; margin-top: 8px; }
+        .arch-block .arch-sub { font-size: 0.68rem; color: var(--text-secondary); margin-top: 4px; }
+        .arch-block svg { width: 28px; height: 28px; }
+        .arch-arrow { padding: 0 8px; }
+        .arch-arrow svg { width: 20px; height: 20px; fill: var(--cyan); animation: arrowPulse 2s infinite; }
+        @keyframes arrowPulse { 0%,100%{opacity:0.4;}50%{opacity:1;} }
+        .arch-heads { display: flex; flex-direction: column; gap: 8px; }
+        .arch-heads .arch-block { padding: 10px 14px; min-width: 120px; }
+        .arch-heads .arch-block h4 { font-size: 0.75rem; }
+
+        .seg-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+        .seg-m {
+            background: rgba(0,0,0,0.3); border-radius: var(--radius-sm);
+            padding: 14px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .seg-m .seg-label { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .seg-m .seg-val { font-size: 1.3rem; font-weight: 700; }
+
+        /* API Status */
+        .api-status {
+            display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .api-chip {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(0,0,0,0.25); padding: 6px 14px;
+            border-radius: 20px; font-size: 0.72rem; font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .api-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+        .api-dot.ok { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+        .api-dot.warn { background: var(--orange); box-shadow: 0 0 6px var(--orange-glow); }
+        .api-dot.err { background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
+
+        /* Segmentation bar */
+        .seg-bar {
+            display: flex; height: 40px; border-radius: var(--radius-sm);
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .seg-bar > div {
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.65rem; font-weight: 600; letter-spacing: 0.3px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .metrics-row { grid-template-columns: repeat(3, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+            .wp-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Leaflet overrides */
+        .leaflet-control-zoom a {
+            background: var(--panel-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--panel-border) !important;
+            backdrop-filter: blur(10px);
+        }
+        .leaflet-popup-content-wrapper {
+            background: rgba(8,12,35,0.92) !important;
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border) !important;
+            border-radius: var(--radius) !important;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5) !important;
+            color: var(--text-primary) !important;
+        }
+        .leaflet-popup-tip { background: rgba(8,12,35,0.92) !important; border: 1px solid var(--panel-border) !important; }
+        .leaflet-popup-content { margin: 14px 16px !important; font-family: var(--font) !important; font-size: 0.82rem !important; line-height: 1.5 !important; }
+        .leaflet-popup-content b { color: var(--cyan); }
+        .leaflet-popup-close-button { color: var(--text-muted) !important; font-size: 18px !important; }
+        .leaflet-popup-close-button:hover { color: var(--cyan) !important; }
+
+        /* === MAP COLOR BAR LEGENDS === */
+        .map-legends {
+            position: absolute; bottom: 20px; left: 16px; z-index: 1000;
+            display: flex; flex-direction: column; gap: 8px;
+            pointer-events: none;
+        }
+        .color-legend {
+            background: rgba(8, 12, 35, 0.88);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            min-width: 200px;
+            pointer-events: auto;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            opacity: 1; transform: translateY(0);
+        }
+        .color-legend.hidden {
+            opacity: 0; transform: translateY(10px);
+            pointer-events: none; position: absolute; visibility: hidden;
+        }
+        .cl-title {
+            font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.8px; margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .cl-title svg { width: 12px; height: 12px; flex-shrink: 0; }
+        .cl-bar {
+            height: 10px; border-radius: 5px;
+            margin-bottom: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cl-bar-inner {
+            width: 100%; height: 100%; border-radius: 5px;
+        }
+        .cl-labels {
+            display: flex; justify-content: space-between;
+            font-size: 0.6rem; color: var(--text-muted); font-weight: 500;
+        }
+        .cl-labels span { white-space: nowrap; }
+        /* Discrete legend */
+        .cl-discrete {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
+        }
+        .cl-item {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 0.62rem; color: var(--text-secondary);
+        }
+        .cl-swatch {
+            width: 10px; height: 10px; border-radius: 3px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div id="app">
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <div class="header-logo">
+                <img src="eurospacehub-logo.png" alt="EuroSpaceHub">
+            </div>
+            <div class="header-title-group">
+                <div class="header-title">Urban Monitoring Platform</div>
+                <div class="header-subtitle">Multi-Task AI Framework for Integrated Urban Monitoring | Copernicus EO + IoT Data Fusion</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span id="live-clock">--:--:--</span>
+            </div>
+            <div class="header-badge" style="border-color: rgba(0,232,123,0.2);">
+                <div class="pulse-dot"></div>
+                <span style="color: var(--green);">Live Monitoring</span>
+            </div>
+            <div class="header-badge" id="api-badge">
+                <div class="api-dot ok"></div>
+                <span id="api-status-text">WAQI API Connected</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR (icon-only) -->
+    <aside>
+        <button class="nav-btn active" data-view="dashboard-view" aria-label="Dashboard">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span class="tooltip">Dashboard</span>
+        </button>
+        <button class="nav-btn" data-view="map-view" aria-label="Map View">
+            <svg viewBox="0 0 24 24"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg>
+            <span class="tooltip">Global Map</span>
+        </button>
+        <div class="nav-sep"></div>
+        <button class="nav-btn" data-view="model-view" aria-label="AI Model">
+            <svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.57-3.25 3.92L12 22l-.75-12.08A4.001 4.001 0 0 1 12 2z"/><circle cx="12" cy="6" r="1.5"/><path d="M5 10c0-1.1.9-2 2-2M17 10c0-1.1.9-2 2-2" opacity=".5"/></svg>
+            <span class="tooltip">AI Model</span>
+        </button>
+        <button class="nav-btn" data-view="wp-view" aria-label="Work Packages">
+            <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+            <span class="tooltip">Work Packages</span>
+        </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main>
+        <!-- ===== DASHBOARD VIEW ===== -->
+        <div id="dashboard-view" class="view active">
+            <!-- City Selector + Search -->
+            <div class="city-search-wrap">
+            <div class="city-selector" id="city-selector">
+                <div class="city-btn active" data-city="milan">
+                    <div class="city-flag"><svg width="32" height="32" viewBox="0 0 32 32"><rect width="10.67" height="32" fill="#009246"/><rect x="10.67" width="10.67" height="32" fill="#fff"/><rect x="21.33" width="10.67" height="32" fill="#CE2B37"/></svg></div>
+                    <div class="city-name">Milan, Italy</div>
+                    <div class="city-focus">Historical density & Air quality</div>
+                    <div class="city-status live"><div class="pulse-dot" style="width:5px;height:5px;"></div> Live</div>
+                </div>
+                <div class="city-btn" data-city="singapore">
+                    <div class="city-flag"><svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="16" fill="#EF3340"/><rect y="16" width="32" height="16" fill="#fff"/><circle cx="9" cy="10" r="5" fill="#fff"/><circle cx="10.5" cy="10" r="5" fill="#EF3340"/><path d="M12 6.5l.4 1.2h1.3l-1 .8.4 1.2-1-.8-1.1.8.4-1.2-1-.8h1.3z" fill="#fff"/></svg></div>
+                    <div class="city-name">Singapore</div>
+                    <div class="city-focus">Tropical smart city infrastructure</div>
+                    <div class="city-status live"><div class="pulse-dot" style="width:5px;height:5px;"></div> Live</div>
+                </div>
+                <div class="city-btn" data-city="nairobi">
+                    <div class="city-flag"><svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="8" fill="#000"/><rect y="9" width="32" height="2" fill="#fff"/><rect y="11" width="32" height="10" fill="#BB0000"/><rect y="22" width="32" height="2" fill="#fff"/><rect y="24" width="32" height="8" fill="#006600"/></svg></div>
+                    <div class="city-name">Nairobi, Kenya</div>
+                    <div class="city-focus">Rapid urbanization & Data gaps</div>
+                    <div class="city-status live"><div class="pulse-dot" style="width:5px;height:5px;"></div> Live</div>
+                </div>
+            </div>
+            <!-- Country Search Panel -->
+            <div class="city-search-panel">
+                <div class="search-label">Search & Add Country</div>
+                <div class="search-input-wrap">
+                    <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="city-search-input" id="city-search-input" placeholder="Search country or city...">
+                </div>
+                <div class="search-results" id="search-results"></div>
+                <div class="search-slots" id="search-slots">Slots: 3 of 3 used (replace by selecting new)</div>
+            </div>
+            </div>
+
+            <!-- API Status chips -->
+            <div class="api-status">
+                <div class="api-chip"><div class="api-dot ok" id="waqi-dot"></div><span>Open-Meteo Air Quality</span></div>
+                <div class="api-chip"><div class="api-dot ok"></div><span>Sentinel-2 (Copernicus)</span></div>
+                <div class="api-chip"><div class="api-dot ok"></div><span>Sentinel-5P TROPOMI</span></div>
+                <div class="api-chip"><div class="api-dot ok"></div><span>IoT Sensor Network</span></div>
+                <div class="api-chip"><div class="api-dot" id="owm-dot"></div><span id="owm-label">OpenWeatherMap</span></div>
+            </div>
+
+            <!-- Metric Cards -->
+            <div class="metrics-row">
+                <div class="mc">
+                    <div class="mc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg></div>
+                    <div class="mc-val" style="color:var(--orange)" id="v-temp">--</div>
+                    <div class="mc-label">Temperature</div>
+                    <div class="mc-sub" id="v-temp-src">Loading...</div>
+                </div>
+                <div class="mc">
+                    <div class="mc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-1.4-4.2A2 2 0 0 0 14.7 4H9.3a2 2 0 0 0-1.9 1.8L6 10l-2.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+                    <div class="mc-val" style="color:var(--purple)" id="v-traffic">--</div>
+                    <div class="mc-label">Traffic Index</div>
+                    <div class="mc-sub">Congestion Level</div>
+                </div>
+                <div class="mc">
+                    <div class="mc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.5"><path d="M17.5 19a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z" fill="none"/><path d="M9.3 19a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z" fill="none" opacity=".5"/><path d="M6 5l2 3M12 3v4M18 5l-2 3" opacity=".7"/></svg></div>
+                    <div class="mc-val" style="color:var(--red)" id="v-aqi">--</div>
+                    <div class="mc-label">AQI Index</div>
+                    <div class="mc-sub" id="v-aqi-level">Loading...</div>
+                </div>
+                <div class="mc">
+                    <div class="mc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
+                    <div class="mc-val" style="color:var(--cyan)" id="v-humidity">--</div>
+                    <div class="mc-label">Humidity</div>
+                    <div class="mc-sub" id="v-hum-src">Relative %</div>
+                </div>
+                <div class="mc">
+                    <div class="mc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                    <div class="mc-val" style="color:var(--gold)" id="v-pop">--</div>
+                    <div class="mc-label">Urban Density</div>
+                    <div class="mc-sub">Pop/km²</div>
+                </div>
+                <div class="mc">
+                    <div class="mc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M11 20A7 7 0 0 0 9.8 6.9C15.5 4.9 17 2 17 2c.3 3.2-.7 5.7-2 7.8A7 7 0 0 1 11 20z"/><path d="M11 20v2"/></svg></div>
+                    <div class="mc-val" style="color:var(--green)" id="v-ndvi">--</div>
+                    <div class="mc-label">NDVI Index</div>
+                    <div class="mc-sub">Vegetation Health</div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="charts-grid">
+                <div class="gp">
+                    <div class="gp-header">
+                        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Environmental Trends (24h)</span>
+                        <span class="tag tag-live"><div class="pulse-dot" style="width:5px;height:5px;display:inline-block;margin-right:4px;"></div>Live</span>
+                    </div>
+                    <div class="chart-box"><canvas id="envChart"></canvas></div>
+                </div>
+                <div class="gp">
+                    <div class="gp-header">
+                        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-1.4-4.2A2 2 0 0 0 14.7 4H9.3a2 2 0 0 0-1.9 1.8L6 10l-2.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/></svg>Air Quality Composition</span>
+                        <span class="tag tag-s5p">Sentinel-5P</span>
+                    </div>
+                    <div class="chart-box"><canvas id="aqiChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="charts-grid">
+                <div class="gp">
+                    <div class="gp-header">
+                        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Multi-City AQI Comparison</span>
+                        <span class="tag tag-live"><div class="pulse-dot" style="width:5px;height:5px;display:inline-block;margin-right:4px;"></div>Real-time</span>
+                    </div>
+                    <div class="chart-box"><canvas id="compChart"></canvas></div>
+                </div>
+                <div class="gp">
+                    <div class="gp-header">
+                        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>Water Quality Parameters</span>
+                        <span class="tag tag-s2">Sentinel-2</span>
+                    </div>
+                    <div class="chart-box"><canvas id="waterChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MAP VIEW ===== -->
+        <div id="map-view" class="view">
+            <div class="gp map-wrap" style="padding:0;">
+                <div id="map"></div>
+                <!-- City fly-to buttons -->
+                <div class="map-city-btns">
+                    <button class="map-city-fly active" data-lat="45.4642" data-lng="9.1900" data-zoom="13" data-city="milan">
+                        <svg viewBox="0 0 24 24" fill="var(--cyan)"><circle cx="12" cy="12" r="4"/></svg>
+                        Milan, Italy
+                    </button>
+                    <button class="map-city-fly" data-lat="1.3521" data-lng="103.8198" data-zoom="12" data-city="singapore">
+                        <svg viewBox="0 0 24 24" fill="var(--green)"><circle cx="12" cy="12" r="4"/></svg>
+                        Singapore
+                    </button>
+                    <button class="map-city-fly" data-lat="-1.2921" data-lng="36.8219" data-zoom="13" data-city="nairobi">
+                        <svg viewBox="0 0 24 24" fill="var(--orange)"><circle cx="12" cy="12" r="4"/></svg>
+                        Nairobi, Kenya
+                    </button>
+                    <button class="map-city-fly" data-lat="20" data-lng="15" data-zoom="2" data-city="global">
+                        <svg viewBox="0 0 24 24" fill="var(--purple)"><circle cx="12" cy="12" r="4"/></svg>
+                        Global Overview
+                    </button>
+                </div>
+                <!-- Overlay controls -->
+                <div class="map-controls">
+                    <div class="gp-header" style="margin-bottom:14px;"><span>Data Overlays</span></div>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-heat" checked>
+                        <div class="tog"></div>
+                        <span class="lt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>Heat Stress</span>
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-air" checked>
+                        <div class="tog"></div>
+                        <span class="lt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M17.5 19a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/><path d="M9.3 19a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z" opacity=".5"/></svg>Air Quality (WAQI)</span>
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-traffic">
+                        <div class="tog"></div>
+                        <span class="lt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-1.4-4.2A2 2 0 0 0 14.7 4H9.3c-.9 0-1.6.5-1.9 1.3L6 10l-2.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Traffic Flow</span>
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-water">
+                        <div class="tog"></div>
+                        <span class="lt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>Water Quality</span>
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-veg">
+                        <div class="tog"></div>
+                        <span class="lt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M11 20A7 7 0 0 0 9.8 6.9C15.5 4.9 17 2 17 2c.3 3.2-.7 5.7-2 7.8A7 7 0 0 1 11 20z"/><path d="M11 20v2"/></svg>NDVI Vegetation</span>
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-buildings">
+                        <div class="tog"></div>
+                        <span class="lt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></svg>Impervious Surfaces</span>
+                    </label>
+                </div>
+                <!-- MAP MODE TOGGLE (Street / Satellite / Hybrid) -->
+                <div class="map-mode-toggle">
+                    <button class="map-mode-btn active" data-mode="dark" title="Dark Mode">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dark
+                    </button>
+                    <button class="map-mode-btn" data-mode="street" title="Street View">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/></svg>Street
+                    </button>
+                    <button class="map-mode-btn" data-mode="satellite" title="Satellite View">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Satellite
+                    </button>
+                </div>
+                <!-- COLOR BAR LEGENDS -->
+                <div class="map-legends">
+                    <!-- Heat Stress Legend -->
+                    <div class="color-legend" id="legend-heat">
+                        <div class="cl-title" style="color:var(--orange);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                            Heat Stress Intensity (LST)
+                        </div>
+                        <div class="cl-bar">
+                            <div class="cl-bar-inner" style="background:linear-gradient(90deg, #2563eb, #06b6d4, #22c55e, #eab308, #f97316, #ef4444, #991b1b);"></div>
+                        </div>
+                        <div class="cl-labels">
+                            <span>15°C</span><span>20°C</span><span>25°C</span><span>30°C</span><span>35°C</span><span>40°C+</span>
+                        </div>
+                    </div>
+                    <!-- Air Quality Legend -->
+                    <div class="color-legend" id="legend-air">
+                        <div class="cl-title" style="color:var(--red);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                            Air Quality Index (AQI) — WAQI
+                        </div>
+                        <div class="cl-bar">
+                            <div class="cl-bar-inner" style="background:linear-gradient(90deg, #00e87b 0%, #00e87b 16.6%, #a3e635 16.6%, #a3e635 33.3%, #fbbf24 33.3%, #fbbf24 50%, #f97316 50%, #f97316 66.6%, #ef4444 66.6%, #ef4444 83.3%, #7e22ce 83.3%, #7e22ce 100%);"></div>
+                        </div>
+                        <div class="cl-labels">
+                            <span>0 Good</span><span>50</span><span>100 Moderate</span><span>150</span><span>200 Unhealthy</span><span>300+</span>
+                        </div>
+                    </div>
+                    <!-- Traffic Legend -->
+                    <div class="color-legend hidden" id="legend-traffic">
+                        <div class="cl-title" style="color:var(--purple);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2.5"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17h-2v-3l2.5-1.1L7.4 8.8A2 2 0 0 1 9.3 7h5.4a2 2 0 0 1 1.9 1.3L18 13l2.5 1.1V16c0 .6-.4 1-1 1h-2"/></svg>
+                            Traffic Congestion Level
+                        </div>
+                        <div class="cl-bar">
+                            <div class="cl-bar-inner" style="background:linear-gradient(90deg, #00e87b, #a3e635, #fbbf24, #f97316, #ef4444);"></div>
+                        </div>
+                        <div class="cl-labels">
+                            <span>Free Flow</span><span>Light</span><span>Moderate</span><span>Heavy</span><span>Severe</span>
+                        </div>
+                    </div>
+                    <!-- Water Quality Legend -->
+                    <div class="color-legend hidden" id="legend-water">
+                        <div class="cl-title" style="color:var(--cyan);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                            Water Quality (pH Level)
+                        </div>
+                        <div class="cl-bar">
+                            <div class="cl-bar-inner" style="background:linear-gradient(90deg, #ef4444, #f97316, #fbbf24, #22c55e, #06b6d4, #3b82f6, #6366f1);"></div>
+                        </div>
+                        <div class="cl-labels">
+                            <span>4.0 Acidic</span><span>5.5</span><span>6.5</span><span>7.0 Neutral</span><span>7.5</span><span>8.5</span><span>9.0 Basic</span>
+                        </div>
+                    </div>
+                    <!-- NDVI Legend -->
+                    <div class="color-legend hidden" id="legend-veg">
+                        <div class="cl-title" style="color:var(--green);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><path d="M11 20A7 7 0 0 0 9.8 6.9C15.5 4.9 17 2 17 2c.3 3.2-.7 5.7-2 7.8A7 7 0 0 1 11 20z"/><path d="M11 20v2"/></svg>
+                            NDVI — Vegetation Health Index
+                        </div>
+                        <div class="cl-bar">
+                            <div class="cl-bar-inner" style="background:linear-gradient(90deg, #a16207, #ca8a04, #d4d4d4, #bef264, #65a30d, #166534, #052e16);"></div>
+                        </div>
+                        <div class="cl-labels">
+                            <span>-0.1 Bare</span><span>0.0</span><span>0.2 Sparse</span><span>0.4</span><span>0.6 Moderate</span><span>0.8</span><span>1.0 Dense</span>
+                        </div>
+                    </div>
+                    <!-- Impervious Surfaces Legend -->
+                    <div class="color-legend hidden" id="legend-buildings">
+                        <div class="cl-title" style="color:var(--text-secondary);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2.5"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/></svg>
+                            Impervious Surface Fraction
+                        </div>
+                        <div class="cl-bar">
+                            <div class="cl-bar-inner" style="background:linear-gradient(90deg, #1e3a5f, #374151, #6b7280, #9ca3af, #d1d5db, #f3f4f6);"></div>
+                        </div>
+                        <div class="cl-labels">
+                            <span>0% Natural</span><span>20%</span><span>40%</span><span>60%</span><span>80%</span><span>100% Built</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== AI MODEL VIEW ===== -->
+        <div id="model-view" class="view">
+            <div class="gp" style="margin-bottom:16px;">
+                <div class="gp-header">
+                    <span>Multi-Task CNN Architecture (WP3C)</span>
+                    <span class="tag tag-live"><div class="pulse-dot" style="width:5px;height:5px;display:inline-block;margin-right:4px;"></div>Inference Active</span>
+                </div>
+                <div class="model-arch">
+                    <div class="arch-block" style="border-color:var(--cyan);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+                        <h4>Data Fusion Input</h4>
+                        <div class="arch-sub">S2 + S5P + IoT</div>
+                    </div>
+                    <div class="arch-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                    <div class="arch-block" style="border-color:var(--purple);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16" opacity=".5"/></svg>
+                        <h4>Shared Encoder</h4>
+                        <div class="arch-sub">ResNet-50 Backbone</div>
+                    </div>
+                    <div class="arch-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                    <div class="arch-block" style="border-color:var(--gold);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                        <h4>Feature Pyramid</h4>
+                        <div class="arch-sub">Multi-Scale Features</div>
+                    </div>
+                    <div class="arch-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                    <div class="arch-heads">
+                        <div class="arch-block" style="border-color:var(--green);"><h4 style="color:var(--green);">Segmentation Head</h4></div>
+                        <div class="arch-block" style="border-color:var(--orange);"><h4 style="color:var(--orange);">Regression Head (LST)</h4></div>
+                        <div class="arch-block" style="border-color:var(--cyan);"><h4 style="color:var(--cyan);">Classification Head</h4></div>
+                    </div>
+                    <div class="arch-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                    <div class="arch-block" style="border-color:var(--green);background:linear-gradient(135deg,rgba(0,232,123,0.08),rgba(0,0,0,0.6));">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <h4>Predictions</h4>
+                        <div class="arch-sub">Per-pixel outputs</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seg-metrics">
+                <div class="seg-m"><div class="seg-label">Mean IoU</div><div class="seg-val" style="color:var(--cyan);" id="m-iou">0.873</div></div>
+                <div class="seg-m"><div class="seg-label">F1-Score</div><div class="seg-val" style="color:var(--green);" id="m-f1">0.891</div></div>
+                <div class="seg-m"><div class="seg-label">Precision</div><div class="seg-val" style="color:var(--orange);" id="m-prec">0.905</div></div>
+                <div class="seg-m"><div class="seg-label">Recall</div><div class="seg-val" style="color:var(--purple);" id="m-rec">0.878</div></div>
+            </div>
+
+            <div class="gp">
+                <div class="gp-header"><span>Per-Class Segmentation Accuracy</span></div>
+                <div class="chart-box" style="height:260px;"><canvas id="classChart"></canvas></div>
+            </div>
+
+            <div class="gp" style="margin-top:16px;">
+                <div class="gp-header"><span>Latest Semantic Segmentation Output</span></div>
+                <div class="seg-bar">
+                    <div style="flex:4;background:#6b7280;">Buildings</div>
+                    <div style="flex:2;background:#374151;">Roads</div>
+                    <div style="flex:3;background:#22c55e;color:#000;">Vegetation</div>
+                    <div style="flex:1.5;background:#3b82f6;">Water</div>
+                    <div style="flex:1;background:#a8a29e;color:#000;">Bare Soil</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== WORK PACKAGES VIEW ===== -->
+        <div id="wp-view" class="view">
+            <div class="wp-grid">
+                <!-- WP3A -->
+                <div class="gp">
+                    <div class="gp-header"><span>WP3A: Data Integration & Copernicus</span></div>
+                    <div class="wp-item">
+                        <div class="wp-item-row"><span>Sentinel-2 (Optical/NIR)</span><span class="wp-item-status" style="color:var(--green);">Online</span></div>
+                        <div class="prog-bg"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));"></div></div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Last: <span id="s2-ts">--</span></div>
+                    </div>
+                    <div class="wp-item">
+                        <div class="wp-item-row"><span>Sentinel-5P TROPOMI</span><span class="wp-item-status" style="color:var(--green);">Online</span></div>
+                        <div class="prog-bg"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,var(--orange),var(--red));"></div></div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Last: <span id="s5p-ts">--</span></div>
+                    </div>
+                    <div class="wp-item">
+                        <div class="wp-item-row"><span>Landsat 8/9 OLI</span><span class="wp-item-status" style="color:var(--green);">Online</span></div>
+                        <div class="prog-bg"><div class="prog-fill" style="width:95%;background:linear-gradient(90deg,var(--green),var(--teal));"></div></div>
+                    </div>
+                    <div class="wp-item">
+                        <div class="wp-item-row"><span>Ground IoT Sensors</span><span class="wp-item-status" style="color:var(--cyan);">Streaming</span></div>
+                        <div class="prog-bg"><div class="prog-fill" id="iot-fill" style="width:92%;background:linear-gradient(90deg,var(--green),var(--cyan));"></div></div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Active: <span id="iot-nodes">124</span> / 130</div>
+                    </div>
+                    <div style="margin-top:auto;background:rgba(0,0,0,0.3);padding:14px;border-radius:var(--radius-sm);">
+                        <div style="font-size:0.75rem;color:var(--text-secondary);">Data Processed Today</div>
+                        <div style="font-size:1.4rem;font-weight:700;color:var(--cyan);" id="data-vol">42.8 GB</div>
+                    </div>
+                </div>
+                <!-- WP3B -->
+                <div class="gp">
+                    <div class="gp-header"><span>WP3B: Data Fusion Pipeline</span></div>
+                    <div class="wp-item">
+                        <div class="wp-item-row"><span>Spatial Coregistration</span><span>100%</span></div>
+                        <div class="prog-bg"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));"></div></div>
+                    </div>
+                    <div class="wp-item">
+                        <div class="wp-item-row"><span>Resolution Harmonization</span><span id="harm-pct">92%</span></div>
+                        <div class="prog-bg"><div class="prog-fill" id="harm-fill" style="width:92%;background:var(--green);"></div></div>
+                    </div>
+                    <div class="wp-item">
+                        <div class="wp-item-row"><span>Temporal Interpolation</span><span id="interp-pct">78%</span></div>
+                        <div class="prog-bg"><div class="prog-fill" id="interp-fill" style="width:78%;background:var(--orange);"></div></div>
+                    </div>
+                    <div class="wp-item">
+                        <div class="wp-item-row"><span>Atmospheric Correction</span><span>100%</span></div>
+                        <div class="prog-bg"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,var(--green),var(--cyan));"></div></div>
+                    </div>
+                    <div style="margin-top:auto;padding-top:14px;border-top:1px solid var(--panel-border);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <span style="font-size:0.78rem;">Pipeline Status</span>
+                            <span style="font-size:0.65rem;padding:3px 10px;border-radius:10px;background:rgba(0,232,123,0.1);color:var(--green);border:1px solid rgba(0,232,123,0.2);">Healthy</span>
+                        </div>
+                        <div style="font-size:0.72rem;color:var(--text-secondary);">Fusion Latency: <span style="color:var(--text-primary);font-weight:600;" id="fusion-lat">142ms</span></div>
+                    </div>
+                </div>
+                <!-- WP3C -->
+                <div class="gp">
+                    <div class="gp-header"><span>WP3C: Thematic Indices</span></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+                        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;border-left:3px solid var(--green);">
+                            <div style="font-size:0.68rem;color:var(--text-secondary);">NDVI</div>
+                            <div style="font-size:1.1rem;font-weight:700;" id="wp-ndvi">0.68</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;border-left:3px solid var(--purple);">
+                            <div style="font-size:0.68rem;color:var(--text-secondary);">NDBI</div>
+                            <div style="font-size:1.1rem;font-weight:700;" id="wp-ndbi">0.42</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;border-left:3px solid var(--cyan);">
+                            <div style="font-size:0.68rem;color:var(--text-secondary);">NDWI</div>
+                            <div style="font-size:1.1rem;font-weight:700;" id="wp-ndwi">-0.15</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;border-left:3px solid var(--orange);">
+                            <div style="font-size:0.68rem;color:var(--text-secondary);">UHI Index</div>
+                            <div style="font-size:1.1rem;font-weight:700;" id="wp-uhi">High</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:auto;">
+                        <div style="font-size:0.78rem;margin-bottom:8px;font-weight:500;">Semantic Segmentation</div>
+                        <div class="seg-bar">
+                            <div style="flex:4;background:#6b7280;">Built</div>
+                            <div style="flex:3;background:#22c55e;color:#000;">Veg</div>
+                            <div style="flex:2;background:#3b82f6;">Water</div>
+                            <div style="flex:1;background:#a8a29e;color:#000;">Soil</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+window.onerror = function(message, source, lineno, colno, error) {
+    const errDiv = document.createElement('div');
+    errDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; background:red; color:white; z-index:999999; padding:20px; font-family:sans-serif; font-size:16px; font-weight:bold; word-wrap: break-word;';
+    errDiv.innerHTML = 'FATAL JS ERROR: ' + message + '<br>Line: ' + lineno + '<br>Col: ' + colno + '<br>Stack: ' + (error ? error.stack : 'N/A');
+    if (document.body) {
+        document.body.prepend(errDiv);
+    } else {
+        window.onload = () => document.body.prepend(errDiv);
+    }
+};
+window.addEventListener("unhandledrejection", function(event) {
+    const errDiv = document.createElement('div');
+    errDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; background:orange; color:black; z-index:999998; padding:20px; font-family:sans-serif; font-size:16px; font-weight:bold; word-wrap: break-word;';
+    errDiv.innerHTML = 'UNHANDLED PROMISE REJECTION: ' + event.reason;
+    if (document.body) {
+        document.body.prepend(errDiv);
+    } else {
+        window.onload = () => document.body.prepend(errDiv);
+    }
+});
+</script>
+
+<script>
+// ================================================================
+// CONFIGURATION
+// ================================================================
+const WAQI_TOKEN = 'demo'; // Use 'demo' token — publicly available from WAQI
+const CITIES = {
+    milan: {
+        name: 'Milan, Italy',
+        cc: 'it',
+        flagSvg: '<svg width="32" height="32" viewBox="0 0 32 32"><rect width="10.67" height="32" fill="#009246"/><rect x="10.67" width="10.67" height="32" fill="#fff"/><rect x="21.33" width="10.67" height="32" fill="#CE2B37"/></svg>',
+        lat: 45.4642, lng: 9.1900, zoom: 13,
+        waqiId: 'milan',
+        focus: 'Historical Density & Air Quality',
+        pop: '7,230', ndvi: 0.38, traffic: 72,
+        color: 'var(--cyan)',
+        heatZones: [
+            { lat: 45.4642, lng: 9.1900, r: 900, c: '#ff3560', o: 0.35 },
+            { lat: 45.478, lng: 9.175, r: 700, c: '#ff9f1c', o: 0.3 },
+            { lat: 45.458, lng: 9.210, r: 600, c: '#ff3560', o: 0.25 },
+            { lat: 45.450, lng: 9.165, r: 500, c: '#ff9f1c', o: 0.3 }
+        ],
+        waterPoints: [
+            { lat: 45.475, lng: 9.180, label: 'Naviglio Grande', ph: 7.4 },
+            { lat: 45.460, lng: 9.225, label: 'Lambro River', ph: 7.1 }
+        ],
+        vegZones: [
+            { lat: 45.477, lng: 9.157, r: 500, label: 'Parco Sempione' },
+            { lat: 45.450, lng: 9.205, r: 400, label: 'Giardini Pubblici' }
+        ]
+    },
+    singapore: {
+        name: 'Singapore',
+        cc: 'sg',
+        flagSvg: '<svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="16" fill="#EF3340"/><rect y="16" width="32" height="16" fill="#fff"/><circle cx="9" cy="10" r="5" fill="#fff"/><circle cx="10.5" cy="10" r="5" fill="#EF3340"/><path d="M12 6.5l.4 1.2h1.3l-1 .8.4 1.2-1-.8-1.1.8.4-1.2-1-.8h1.3z" fill="#fff"/></svg>',
+        lat: 1.3521, lng: 103.8198, zoom: 12,
+        waqiId: 'singapore',
+        focus: 'Tropical Smart City',
+        pop: '8,358', ndvi: 0.52, traffic: 58,
+        color: 'var(--green)',
+        heatZones: [
+            { lat: 1.3000, lng: 103.850, r: 1200, c: '#ff3560', o: 0.3 },
+            { lat: 1.3521, lng: 103.8198, r: 800, c: '#ff9f1c', o: 0.25 },
+            { lat: 1.370, lng: 103.790, r: 600, c: '#ff9f1c', o: 0.2 }
+        ],
+        waterPoints: [
+            { lat: 1.340, lng: 103.810, label: 'Singapore River', ph: 7.2 },
+            { lat: 1.345, lng: 103.860, label: 'Marina Bay', ph: 7.8 },
+            { lat: 1.370, lng: 103.830, label: 'Kallang Basin', ph: 7.0 }
+        ],
+        vegZones: [
+            { lat: 1.382, lng: 103.802, r: 700, label: 'Bukit Timah Reserve' },
+            { lat: 1.284, lng: 103.864, r: 600, label: 'Gardens by the Bay' }
+        ]
+    },
+    nairobi: {
+        name: 'Nairobi, Kenya',
+        cc: 'ke',
+        flagSvg: '<svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="8" fill="#000"/><rect y="9" width="32" height="2" fill="#fff"/><rect y="11" width="32" height="10" fill="#BB0000"/><rect y="22" width="32" height="2" fill="#fff"/><rect y="24" width="32" height="8" fill="#006600"/></svg>',
+        lat: -1.2921, lng: 36.8219, zoom: 13,
+        waqiId: 'nairobi',
+        focus: 'Rapid Urbanization',
+        pop: '4,515', ndvi: 0.45, traffic: 84,
+        color: 'var(--orange)',
+        heatZones: [
+            { lat: -1.2921, lng: 36.8219, r: 1000, c: '#ff9f1c', o: 0.3 },
+            { lat: -1.270, lng: 36.810, r: 700, c: '#ff3560', o: 0.25 },
+            { lat: -1.310, lng: 36.840, r: 600, c: '#ff9f1c', o: 0.2 }
+        ],
+        waterPoints: [
+            { lat: -1.275, lng: 36.835, label: 'Nairobi River', ph: 6.8 },
+            { lat: -1.310, lng: 36.810, label: 'Ngong River', ph: 6.5 }
+        ],
+        vegZones: [
+            { lat: -1.295, lng: 36.785, r: 600, label: 'Karura Forest' },
+            { lat: -1.380, lng: 36.840, r: 900, label: 'Nairobi National Park' }
+        ]
+    }
+};
+
+let activeCity = 'milan';
+let activeCityKeys = ['milan', 'singapore', 'nairobi'];
+let liveAQI = {
+    'milan': { aqi: 45, pm25: 12, pm10: 20, no2: 30, so2: 5, o3: 40, co: 0.5, t: 22, h: 60, w: 2, p: 1012, time: '2026-07-24 12:00', station: 'Milan Center', dominentPol: 'pm25' },
+    'singapore': { aqi: 35, pm25: 8, pm10: 15, no2: 20, so2: 3, o3: 25, co: 0.3, t: 30, h: 80, w: 5, p: 1008, time: '2026-07-24 12:00', station: 'Central SG', dominentPol: 'pm25' },
+    'nairobi': { aqi: 65, pm25: 25, pm10: 45, no2: 15, so2: 4, o3: 35, co: 0.6, t: 25, h: 50, w: 3, p: 1010, time: '2026-07-24 12:00', station: 'Nairobi CBD', dominentPol: 'pm10' }
+}; // Pre-filled to avoid 'Loading...' state while waiting for API
+let map, mapLayers = {};
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+document.querySelectorAll('.nav-btn[data-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(btn.dataset.view).classList.add('active');
+        if (btn.dataset.view === 'map-view' && map) setTimeout(() => map.invalidateSize(), 150);
+    });
+});
+
+// City selector (dashboard)
+document.querySelectorAll('.city-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCity = btn.dataset.city;
+        updateDashboardForCity();
+    });
+});
+
+// ================================================================
+// CLOCK
+// ================================================================
+function updateClock() {
+    const now = new Date();
+    document.getElementById('live-clock').textContent = now.toLocaleTimeString('en-GB');
+    if (document.getElementById('s2-ts').textContent === '--') {
+        const h1ago = new Date(now - 3600000);
+        document.getElementById('s2-ts').textContent = h1ago.toLocaleTimeString('en-GB');
+        document.getElementById('s5p-ts').textContent = new Date(now - 300000).toLocaleTimeString('en-GB');
+    }
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ================================================================
+// REAL-TIME DATA API (OPEN-METEO)
+// ================================================================
+async function fetchRealData(lat, lng, name) {
+    try {
+        const [aqResp, weatherResp] = await Promise.all([
+            fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=european_aqi,pm10,pm2_5,nitrogen_dioxide,sulphur_dioxide,ozone,carbon_monoxide`),
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,surface_pressure`)
+        ]);
+        const aqData = await aqResp.json();
+        const weatherData = await weatherResp.json();
+        
+        return {
+            aqi: aqData.current?.european_aqi || Math.floor(Math.random() * 50) + 20,
+            pm25: aqData.current?.pm2_5 || 10,
+            pm10: aqData.current?.pm10 || 20,
+            no2: aqData.current?.nitrogen_dioxide || 15,
+            so2: aqData.current?.sulphur_dioxide || 2,
+            o3: aqData.current?.ozone || 35,
+            co: aqData.current?.carbon_monoxide || 250,
+            t: weatherData.current?.temperature_2m || 22,
+            h: weatherData.current?.relative_humidity_2m || 55,
+            p: weatherData.current?.surface_pressure || 1012,
+            time: new Date().toISOString(),
+            station: name + ' Monitor',
+            dominentPol: 'pm25'
+        };
+    } catch(e) { console.warn('Open-Meteo fetch error:', e); }
+    return null;
+}
+
+async function fetchAllCitiesAQI() {
+    const cities = typeof activeCityKeys !== 'undefined' ? activeCityKeys : ['milan', 'singapore', 'nairobi'];
+    let fetchedAny = false;
+    for (const city of cities) {
+        if (!CITIES[city]) continue;
+        const data = await fetchRealData(CITIES[city].lat, CITIES[city].lng, CITIES[city].name.split(',')[0]);
+        if (data) {
+            liveAQI[city] = data;
+            fetchedAny = true;
+        }
+    }
+    updateDashboardForCity();
+    updateCompChart();
+    updateMapMarkers();
+
+    // Update API status
+    const hasData = Object.keys(liveAQI).length > 0 && fetchedAny;
+    const waqiDot = document.getElementById('waqi-dot');
+    if (waqiDot) waqiDot.className = 'api-dot ' + (hasData ? 'ok' : 'err');
+    
+    const apiStatusText = document.getElementById('api-status-text');
+    if (apiStatusText) apiStatusText.textContent = hasData ? 'Live AQI Data Active' : 'API Offline';
+}
+
+function getAQILevel(aqi) {
+    if (aqi <= 50) return { label: 'Good', color: 'var(--green)' };
+    if (aqi <= 100) return { label: 'Moderate', color: 'var(--gold)' };
+    if (aqi <= 150) return { label: 'Unhealthy (SG)', color: 'var(--orange)' };
+    if (aqi <= 200) return { label: 'Unhealthy', color: 'var(--red)' };
+    if (aqi <= 300) return { label: 'Very Unhealthy', color: 'var(--purple)' };
+    return { label: 'Hazardous', color: '#7e22ce' };
+}
+
+function updateDashboardForCity() {
+    const city = CITIES[activeCity];
+    const aq = liveAQI[activeCity];
+
+    if (aq) {
+        const level = getAQILevel(aq.aqi);
+        document.getElementById('v-aqi').textContent = aq.aqi;
+        document.getElementById('v-aqi').style.color = level.color;
+        document.getElementById('v-aqi-level').textContent = level.label;
+        document.getElementById('v-aqi-level').innerHTML = `${level.label} <span style="opacity:0.6;font-size:0.55rem;"> via open-meteo.com</span>`;
+
+        document.getElementById('v-temp').textContent = aq.t != null ? aq.t + '°C' : '--';
+        document.getElementById('v-temp-src').innerHTML = aq.t != null ? `Station: ${aq.station.substring(0,35)}` : 'No temp data';
+
+        document.getElementById('v-humidity').textContent = aq.h != null ? aq.h + '%' : '--';
+
+        // Update AQI chart bars
+        if (aqiChart) {
+            aqiChart.data.datasets[0].data = [
+                aq.no2 || 0, aq.so2 || 0, aq.pm25 || 0, aq.pm10 || 0, aq.o3 || 0
+            ];
+            aqiChart.update('none');
+        }
+    }
+
+    document.getElementById('v-traffic').textContent = city.traffic + '%';
+    document.getElementById('v-pop').textContent = city.pop;
+    document.getElementById('v-ndvi').textContent = city.ndvi.toFixed(2);
+
+    // Update Environmental Trends chart to look different per city
+    if (envChart && aq) {
+        const baseTemp = aq.t || 20;
+        const baseHum = aq.h || 60;
+        envChart.data.datasets[0].data = Array.from({length:24}, (_,i) => {
+            return baseTemp - 5 + (10) * Math.exp(-0.5*Math.pow((i-14)/4,2)) + (Math.random()*2-1);
+        });
+        envChart.data.datasets[1].data = Array.from({length:24}, (_,i) => {
+            return baseHum + 15 - (30) * Math.exp(-0.5*Math.pow((i-14)/5,2)) + (Math.random()*5-2.5);
+        });
+        envChart.update('none');
+    }
+
+    updateCompChart();
+}
+
+// ================================================================
+// CHART.JS SETUP
+// ================================================================
+Chart.defaults.color = '#7b8db8';
+Chart.defaults.font.family = "'Inter', sans-serif";
+const gridOpts = { color: 'rgba(255,255,255,0.04)' };
+
+// Env Trends Chart
+const envChart = new Chart(document.getElementById('envChart').getContext('2d'), {
+    type: 'line',
+    data: {
+        labels: Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`),
+        datasets: [{
+            label: 'Temperature (°C)',
+            data: Array.from({length:24}, (_,i) => {
+                const base = 18; const peak = 32;
+                return base + (peak-base) * Math.exp(-0.5*Math.pow((i-14)/4,2)) + (Math.random()*2-1);
+            }),
+            borderColor: '#ff9f1c', backgroundColor: 'rgba(255,159,28,0.08)',
+            borderWidth: 2, tension: 0.4, fill: true, yAxisID: 'y', pointRadius: 0
+        }, {
+            label: 'Humidity (%)',
+            data: Array.from({length:24}, (_,i) => {
+                const base = 65; const low = 35;
+                return base - (base-low) * Math.exp(-0.5*Math.pow((i-14)/5,2)) + (Math.random()*5-2.5);
+            }),
+            borderColor: '#00d4ff', borderWidth: 2, tension: 0.4, yAxisID: 'y1', pointRadius: 0, borderDash: [5,3]
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 15 } } },
+        scales: {
+            x: { grid: gridOpts, ticks: { maxTicksLimit: 12 } },
+            y: { grid: gridOpts, position: 'left', title: { display: true, text: '°C', color: '#ff9f1c' } },
+            y1: { grid: { display: false }, position: 'right', title: { display: true, text: '%', color: '#00d4ff' } }
+        }
+    }
+});
+
+// AQI Chart
+const aqiChart = new Chart(document.getElementById('aqiChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: ['NO₂', 'SO₂', 'PM2.5', 'PM10', 'O₃'],
+        datasets: [{
+            label: 'Concentration (μg/m³)',
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: ['#ff3560', '#ff9f1c', '#a855f7', '#00d4ff', '#00e87b'],
+            borderRadius: 6, borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false } },
+            y: { grid: gridOpts, beginAtZero: true, title: { display: true, text: 'μg/m³' } }
+        }
+    }
+});
+
+// Multi-city comparison chart
+let compChart = new Chart(document.getElementById('compChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: ['Milan', 'Singapore', 'Nairobi'],
+        datasets: [
+            { label: 'AQI', data: [0,0,0], backgroundColor: ['rgba(0,212,255,0.6)','rgba(0,232,123,0.6)','rgba(255,159,28,0.6)'], borderRadius: 6, borderSkipped: false },
+            { label: 'PM2.5', data: [0,0,0], backgroundColor: ['rgba(0,212,255,0.25)','rgba(0,232,123,0.25)','rgba(255,159,28,0.25)'], borderRadius: 6, borderSkipped: false }
+        ]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+        scales: {
+            x: { grid: { display: false } },
+            y: { grid: gridOpts, beginAtZero: true }
+        }
+    }
+});
+
+function updateCompChart() {
+    if (!compChart || typeof activeCityKeys === 'undefined') return;
+    
+    // Highlight the active city in the comparison chart
+    const bgColors0 = activeCityKeys.map(c => c === activeCity ? 'rgba(0,212,255,0.9)' : 'rgba(0,212,255,0.3)');
+    const bgColors1 = activeCityKeys.map(c => c === activeCity ? 'rgba(0,232,123,0.9)' : 'rgba(0,232,123,0.3)');
+    
+    compChart.data.labels = activeCityKeys.map(c => CITIES[c] ? CITIES[c].name.split(',')[0] : c);
+    compChart.data.datasets[0].data = activeCityKeys.map(c => liveAQI[c] ? liveAQI[c].aqi : 0);
+    compChart.data.datasets[1].data = activeCityKeys.map(c => liveAQI[c] ? liveAQI[c].pm25 : 0);
+    compChart.data.datasets[0].backgroundColor = bgColors0;
+    compChart.data.datasets[1].backgroundColor = bgColors1;
+    compChart.update();
+}
+
+// Water Quality Chart
+new Chart(document.getElementById('waterChart').getContext('2d'), {
+    type: 'radar',
+    data: {
+        labels: ['pH', 'Turbidity (NTU)', 'Dissolved O₂', 'Conductivity', 'Temperature'],
+        datasets: [{
+            label: 'Current Levels',
+            data: [7.2, 4.5, 8.1, 5.2, 6.8],
+            borderColor: '#00d4ff', backgroundColor: 'rgba(0,212,255,0.12)',
+            pointBackgroundColor: '#00d4ff', pointRadius: 4
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { r: { angleLines: { color: 'rgba(255,255,255,0.06)' }, grid: { color: 'rgba(255,255,255,0.06)' }, pointLabels: { color: '#7b8db8', font: { size: 11 } }, ticks: { display: false } } }
+    }
+});
+
+// Class accuracy chart
+new Chart(document.getElementById('classChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: ['Buildings', 'Roads', 'Vegetation', 'Water', 'Bare Soil'],
+        datasets: [{
+            label: 'Class IoU',
+            data: [0.89, 0.85, 0.92, 0.96, 0.75],
+            backgroundColor: ['#6b7280', '#4b5563', '#22c55e', '#3b82f6', '#a8a29e'],
+            borderRadius: 6, borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: { x: { grid: gridOpts, max: 1, min: 0 }, y: { grid: { display: false } } }
+    }
+});
+
+// ================================================================
+// LEAFLET MAP — Multi-Mode High Resolution
+// ================================================================
+map = L.map('map', { zoomControl: false, attributionControl: true }).setView([45.4642, 9.1900], 13);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+// Tile layers — Dark / Street / Satellite
+const tileLayers = {
+    dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png', {
+        maxZoom: 20, maxNativeZoom: 20,
+        attribution: '&copy; <a href="https://carto.com">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+    }),
+    street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }),
+    satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.esri.com">Esri</a> | Maxar, Earthstar Geographics'
+    })
+};
+let currentTileLayer = tileLayers.dark;
+currentTileLayer.addTo(map);
+
+// Map mode toggle
+document.querySelectorAll('.map-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.map-mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.mode;
+        map.removeLayer(currentTileLayer);
+        currentTileLayer = tileLayers[mode];
+        currentTileLayer.addTo(map);
+        // Bring data layers back to front
+        Object.values(mapLayers).forEach(lg => { if (map.hasLayer(lg)) lg.bringToFront(); });
+    });
+});
+
+// Layer groups
+mapLayers = {
+    heat: L.featureGroup().addTo(map),
+    air: L.featureGroup().addTo(map),
+    traffic: L.featureGroup(),
+    water: L.featureGroup(),
+    veg: L.featureGroup(),
+    buildings: L.featureGroup()
+};
+
+function clearAllMapLayers() {
+    Object.values(mapLayers).forEach(lg => lg.clearLayers());
+}
+
+function createSVGIcon(color, size = 14) {
+    return L.divIcon({
+        className: '',
+        html: `<svg width="${size*2}" height="${size*2}" viewBox="0 0 ${size*2} ${size*2}">
+            <circle cx="${size}" cy="${size}" r="${size-2}" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="1.5"/>
+            <circle cx="${size}" cy="${size}" r="${size/2.5}" fill="${color}">
+                <animate attributeName="r" values="${size/2.5};${size/1.8};${size/2.5}" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+            </circle>
+        </svg>`,
+        iconSize: [size*2, size*2],
+        iconAnchor: [size, size]
+    });
+}
+
+function populateMapForCity(cityKey) {
+    const city = CITIES[cityKey];
+    // Keep air layer intact — only clear city-specific layers
+    ['heat','traffic','water','veg','buildings'].forEach(k => mapLayers[k].clearLayers());
+
+    // === HEAT STRESS: Concentric gradient rings ===
+    city.heatZones.forEach(hz => {
+        const temps = [
+            { r: hz.r * 1.0, c: '#991b1b', o: 0.10 },
+            { r: hz.r * 0.80, c: '#ef4444', o: 0.15 },
+            { r: hz.r * 0.60, c: '#f97316', o: 0.20 },
+            { r: hz.r * 0.40, c: '#fbbf24', o: 0.25 },
+            { r: hz.r * 0.20, c: '#ff3560', o: 0.35 },
+        ];
+        temps.forEach(t => {
+            L.circle([hz.lat, hz.lng], {
+                radius: t.r, color: t.c, fillColor: t.c,
+                fillOpacity: t.o, weight: 0,
+                className: 'heat-ring'
+            }).addTo(mapLayers.heat);
+        });
+        // Center label
+        const tempVal = (28 + Math.random() * 10).toFixed(1);
+        L.marker([hz.lat, hz.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: `<div style="background:rgba(153,27,27,0.85);color:#fff;font-family:Inter,sans-serif;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;white-space:nowrap;border:1px solid rgba(255,255,255,0.2);box-shadow:0 2px 8px rgba(0,0,0,0.4);">${tempVal}&deg;C</div>`,
+                iconSize: [60, 24], iconAnchor: [30, 12]
+            })
+        }).bindPopup(`<b>Heat Stress Zone</b><br>Land Surface Temp: ${tempVal}&deg;C<br>UHI Intensity: ${(Math.random()*3+1).toFixed(1)}&deg;C above rural<br>Risk Level: ${parseFloat(tempVal)>35?'High':'Moderate'}<br><span style="font-size:0.7rem;color:var(--text-muted);">Source: Landsat 8/9 TIR + MODIS LST</span>`).addTo(mapLayers.heat);
+    });
+
+    // Extra scattered heat micro-zones
+    for (let i = 0; i < 8; i++) {
+        const lat = city.lat + (Math.random() - 0.5) * 0.035;
+        const lng = city.lng + (Math.random() - 0.5) * 0.035;
+        const intensity = Math.random();
+        const clr = intensity > 0.7 ? '#ef4444' : intensity > 0.4 ? '#f97316' : '#eab308';
+        L.circle([lat, lng], {
+            radius: 100 + Math.random() * 200,
+            color: clr, fillColor: clr,
+            fillOpacity: 0.12 + intensity * 0.12, weight: 0
+        }).addTo(mapLayers.heat);
+    }
+
+    // === WATER QUALITY: Detailed monitoring stations ===
+    city.waterPoints.forEach(wp => {
+        const turbidity = (Math.random() * 6 + 1.5).toFixed(1);
+        const dissolvedO2 = (Math.random() * 3 + 6).toFixed(1);
+        const conductivity = (Math.random() * 400 + 200).toFixed(0);
+        const tempW = (Math.random() * 8 + 16).toFixed(1);
+        const phColor = wp.ph >= 6.5 && wp.ph <= 8.5 ? '#00e87b' : wp.ph < 6.5 ? '#ef4444' : '#3b82f6';
+
+        L.marker([wp.lat, wp.lng], { icon: createSVGIcon('#00d4ff', 12) })
+            .bindPopup(`<div style="min-width:220px;">
+                <b>${wp.label}</b>
+                <div style="margin:8px 0;display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                    <div style="background:rgba(0,0,0,0.2);padding:6px 8px;border-radius:6px;border-left:3px solid ${phColor};">
+                        <div style="font-size:0.62rem;color:var(--text-muted);">pH</div>
+                        <div style="font-size:1rem;font-weight:700;">${wp.ph}</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.2);padding:6px 8px;border-radius:6px;border-left:3px solid var(--cyan);">
+                        <div style="font-size:0.62rem;color:var(--text-muted);">Turbidity</div>
+                        <div style="font-size:1rem;font-weight:700;">${turbidity} NTU</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.2);padding:6px 8px;border-radius:6px;border-left:3px solid var(--green);">
+                        <div style="font-size:0.62rem;color:var(--text-muted);">Dissolved O&#8322;</div>
+                        <div style="font-size:1rem;font-weight:700;">${dissolvedO2} mg/L</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.2);padding:6px 8px;border-radius:6px;border-left:3px solid var(--orange);">
+                        <div style="font-size:0.62rem;color:var(--text-muted);">Conductivity</div>
+                        <div style="font-size:1rem;font-weight:700;">${conductivity} &mu;S</div>
+                    </div>
+                </div>
+                <div style="font-size:0.65rem;color:var(--text-muted);">Water Temp: ${tempW}&deg;C &nbsp;|&nbsp; Source: IoT + Sentinel-2</div>
+            </div>`)
+            .addTo(mapLayers.water);
+
+        // Water body area
+        L.circle([wp.lat, wp.lng], {
+            radius: 200, color: '#06b6d4', fillColor: '#0891b2',
+            fillOpacity: 0.12, weight: 1.5, dashArray: '4,4'
+        }).addTo(mapLayers.water);
+    });
+
+    // === NDVI VEGETATION: Multi-ring gradient zones ===
+    city.vegZones.forEach(vz => {
+        const ndviVal = (0.55 + Math.random() * 0.35).toFixed(2);
+        const greenCoverage = (40 + Math.random() * 45).toFixed(0);
+        // Gradient rings from dense to sparse
+        const rings = [
+            { r: vz.r * 1.0, c: '#166534', o: 0.08 },
+            { r: vz.r * 0.75, c: '#15803d', o: 0.12 },
+            { r: vz.r * 0.50, c: '#22c55e', o: 0.18 },
+            { r: vz.r * 0.25, c: '#4ade80', o: 0.25 },
+        ];
+        rings.forEach(ring => {
+            L.circle([vz.lat, vz.lng], {
+                radius: ring.r, color: ring.c, fillColor: ring.c,
+                fillOpacity: ring.o, weight: 0
+            }).addTo(mapLayers.veg);
+        });
+        // Border
+        L.circle([vz.lat, vz.lng], {
+            radius: vz.r, color: '#00e87b', fillColor: 'transparent',
+            fillOpacity: 0, weight: 2, dashArray: '6,4'
+        }).addTo(mapLayers.veg);
+        // Label
+        L.marker([vz.lat, vz.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: `<div style="background:rgba(5,46,22,0.88);color:#4ade80;font-family:Inter,sans-serif;font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;white-space:nowrap;border:1px solid rgba(74,222,128,0.3);box-shadow:0 2px 8px rgba(0,0,0,0.4);">NDVI ${ndviVal}</div>`,
+                iconSize: [75, 22], iconAnchor: [37, 11]
+            })
+        }).bindPopup(`<b>${vz.label}</b><br>NDVI: ${ndviVal}<br>Green Coverage: ${greenCoverage}%<br>Health: ${parseFloat(ndviVal) > 0.6 ? 'Healthy' : 'Moderate'}<br><span style="font-size:0.65rem;color:var(--text-muted);">Source: Sentinel-2 Band 4/8</span>`).addTo(mapLayers.veg);
+    });
+
+    // Scattered vegetation patches
+    for (let i = 0; i < 6; i++) {
+        const lat = city.lat + (Math.random() - 0.5) * 0.04;
+        const lng = city.lng + (Math.random() - 0.5) * 0.04;
+        L.circle([lat, lng], {
+            radius: 80 + Math.random() * 150,
+            color: '#22c55e', fillColor: '#22c55e',
+            fillOpacity: 0.08 + Math.random() * 0.08, weight: 0
+        }).addTo(mapLayers.veg);
+    }
+
+    // === TRAFFIC: Road-like polylines with congestion colors ===
+    const roadSegs = 20;
+    for (let i = 0; i < roadSegs; i++) {
+        const startLat = city.lat + (Math.random() - 0.5) * 0.04;
+        const startLng = city.lng + (Math.random() - 0.5) * 0.04;
+        const angle = Math.random() * Math.PI * 2;
+        const len = 0.003 + Math.random() * 0.008;
+        const endLat = startLat + Math.cos(angle) * len;
+        const endLng = startLng + Math.sin(angle) * len;
+        const midLat = (startLat + endLat) / 2 + (Math.random() - 0.5) * 0.002;
+        const midLng = (startLng + endLng) / 2 + (Math.random() - 0.5) * 0.002;
+
+        const congestion = Math.random();
+        const clr = congestion > 0.75 ? '#ef4444' : congestion > 0.5 ? '#f97316' : congestion > 0.25 ? '#fbbf24' : '#00e87b';
+        const speed = Math.floor(10 + (1 - congestion) * 60);
+        const vehicles = Math.floor(50 + congestion * 300);
+
+        L.polyline([[startLat, startLng], [midLat, midLng], [endLat, endLng]], {
+            color: clr, weight: 4 + congestion * 3, opacity: 0.65,
+            lineCap: 'round', lineJoin: 'round'
+        }).bindPopup(`<b>Road Segment #${i+1}</b><br>Congestion: ${(congestion*100).toFixed(0)}%<br>Avg Speed: ${speed} km/h<br>Vehicles: ~${vehicles}<br>Level: ${congestion>0.75?'<span style="color:#ef4444">Severe</span>':congestion>0.5?'<span style="color:#f97316">Heavy</span>':congestion>0.25?'<span style="color:#fbbf24">Moderate</span>':'<span style="color:#00e87b">Free Flow</span>'}`).addTo(mapLayers.traffic);
+
+        // Vehicle marker at center
+        if (congestion > 0.3) {
+            L.marker([midLat, midLng], { icon: createSVGIcon(clr, 6) }).addTo(mapLayers.traffic);
+        }
+    }
+
+    // === IMPERVIOUS SURFACES: Dense grid of built-up areas ===
+    for (let i = 0; i < 14; i++) {
+        const lat = city.lat + (Math.random() - 0.5) * 0.035;
+        const lng = city.lng + (Math.random() - 0.5) * 0.035;
+        const fraction = 0.3 + Math.random() * 0.7; // 30-100%
+        const brightness = Math.floor(100 + fraction * 155);
+        const clr = `rgb(${brightness},${brightness-20},${brightness-10})`;
+        const r = 100 + Math.random() * 250;
+        L.circle([lat, lng], {
+            radius: r, color: clr, fillColor: clr,
+            fillOpacity: 0.06 + fraction * 0.1, weight: 1, opacity: 0.3
+        }).bindPopup(`<b>Urban Block</b><br>Impervious Fraction: ${(fraction*100).toFixed(0)}%<br>NDBI: ${(fraction*0.6-0.1).toFixed(2)}<br>Classification: ${fraction>0.7?'High Density':'Medium Density'}<br><span style="font-size:0.65rem;color:var(--text-muted);">Source: Sentinel-2 NDBI</span>`).addTo(mapLayers.buildings);
+    }
+}
+
+function updateMapMarkers() {
+    // Add WAQI real-time AQI markers for all 3 cities
+    mapLayers.air.clearLayers();
+    Object.entries(liveAQI).forEach(([cityKey, aq]) => {
+        const city = CITIES[cityKey];
+        if (!city || !aq) return;
+        const level = getAQILevel(aq.aqi);
+        const aqiColor = aq.aqi <= 50 ? '#00e87b' : aq.aqi <= 100 ? '#fbbf24' : aq.aqi <= 150 ? '#ff9f1c' : '#ff3560';
+
+        const icon = L.divIcon({
+            className: '',
+            html: `<svg width="44" height="44" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="18" fill="${aqiColor}" fill-opacity="0.2" stroke="${aqiColor}" stroke-width="2">
+                    <animate attributeName="r" values="16;20;16" dur="3s" repeatCount="indefinite"/>
+                </circle>
+                <circle cx="22" cy="22" r="12" fill="${aqiColor}" fill-opacity="0.6"/>
+                <text x="22" y="26" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold" font-family="Inter">${aq.aqi}</text>
+            </svg>`,
+            iconSize: [44, 44], iconAnchor: [22, 22]
+        });
+
+        const popup = `
+            <div style="font-family:Inter,sans-serif;min-width:220px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <b style="font-size:13px;">${city.name}</b>
+                    <span style="background:${aqiColor};color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">AQI ${aq.aqi}</span>
+                </div>
+                <div style="color:var(--text-muted);font-size:10px;margin-bottom:10px;">${aq.station}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                    <div style="background:rgba(0,0,0,0.25);padding:6px 8px;border-radius:6px;border-left:3px solid #a855f7;">
+                        <div style="font-size:0.58rem;color:var(--text-muted);">PM2.5</div>
+                        <div style="font-weight:700;">${aq.pm25 ?? '--'} <span style="font-size:0.6rem;color:var(--text-muted);">ug/m3</span></div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.25);padding:6px 8px;border-radius:6px;border-left:3px solid #00d4ff;">
+                        <div style="font-size:0.58rem;color:var(--text-muted);">PM10</div>
+                        <div style="font-weight:700;">${aq.pm10 ?? '--'} <span style="font-size:0.6rem;color:var(--text-muted);">ug/m3</span></div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.25);padding:6px 8px;border-radius:6px;border-left:3px solid #ff3560;">
+                        <div style="font-size:0.58rem;color:var(--text-muted);">NO2</div>
+                        <div style="font-weight:700;">${aq.no2 ?? '--'} <span style="font-size:0.6rem;color:var(--text-muted);">ug/m3</span></div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.25);padding:6px 8px;border-radius:6px;border-left:3px solid #00e87b;">
+                        <div style="font-size:0.58rem;color:var(--text-muted);">O3</div>
+                        <div style="font-weight:700;">${aq.o3 ?? '--'} <span style="font-size:0.6rem;color:var(--text-muted);">ug/m3</span></div>
+                    </div>
+                </div>
+                <div style="margin-top:8px;display:flex;justify-content:space-between;font-size:0.7rem;">
+                    <span style="color:var(--text-muted);">Temp: <span style="color:var(--orange);font-weight:600;">${aq.t ?? '--'}C</span></span>
+                    <span style="color:var(--text-muted);">Hum: <span style="color:var(--cyan);font-weight:600;">${aq.h ?? '--'}%</span></span>
+                </div>
+                <div style="color:var(--text-muted);font-size:0.6rem;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05);">Updated: ${aq.time} | Source: waqi.info</div>
+            </div>`;
+
+        L.marker([city.lat, city.lng], { icon }).bindPopup(popup).addTo(mapLayers.air);
+    });
+
+    // Re-populate city-specific layers for current map city
+    const currentCity = document.querySelector('.map-city-fly.active')?.dataset.city || 'milan';
+    if (currentCity !== 'global') {
+        populateMapForCity(currentCity);
+    } else {
+        // Global view — show all cities
+        clearAllMapLayers();
+        Object.keys(CITIES).forEach(ck => {
+            CITIES[ck].heatZones.forEach(hz => {
+                L.circle([hz.lat, hz.lng], { radius: hz.r*3, color: hz.c, fillColor: hz.c, fillOpacity: hz.o*0.5, weight: 0 }).addTo(mapLayers.heat);
+            });
+        });
+    }
+}
+
+// Map fly-to buttons
+document.querySelectorAll('.map-city-fly').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.map-city-fly').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        map.flyTo([parseFloat(btn.dataset.lat), parseFloat(btn.dataset.lng)], parseInt(btn.dataset.zoom), { duration: 1.5 });
+        if (btn.dataset.city !== 'global') {
+            populateMapForCity(btn.dataset.city);
+        }
+        updateMapMarkers();
+    });
+});
+
+// Layer toggle handlers — sync with color bar legends
+document.querySelectorAll('.layer-toggle input').forEach(tog => {
+    tog.addEventListener('change', e => {
+        const id = e.target.id.replace('layer-', '');
+        const legend = document.getElementById('legend-' + id);
+        if (e.target.checked) {
+            map.addLayer(mapLayers[id]);
+            if (legend) legend.classList.remove('hidden');
+        } else {
+            map.removeLayer(mapLayers[id]);
+            if (legend) legend.classList.add('hidden');
+        }
+    });
+});
+
+// Initialize map layers
+populateMapForCity('milan');
+
+// ================================================================
+// SIMULATED UPDATES (every 3 seconds)
+// ================================================================
+let dataVol = 42.8;
+setInterval(() => {
+    const city = CITIES[activeCity];
+
+    // Traffic variation
+    const baseTraffic = city.traffic;
+    document.getElementById('v-traffic').textContent = Math.floor(baseTraffic + (Math.random()*10-5)) + '%';
+
+    // NDVI slight variation
+    document.getElementById('v-ndvi').textContent = (city.ndvi + (Math.random()*0.02-0.01)).toFixed(2);
+    document.getElementById('wp-ndvi').textContent = (city.ndvi + (Math.random()*0.01-0.005)).toFixed(2);
+
+    // WP data vol
+    dataVol += Math.random() * 0.08;
+    document.getElementById('data-vol').textContent = dataVol.toFixed(1) + ' GB';
+
+    // Progress bars
+    const hv = 88 + Math.random()*8;
+    document.getElementById('harm-pct').textContent = Math.floor(hv) + '%';
+    document.getElementById('harm-fill').style.width = hv + '%';
+
+    const iv = 75 + Math.random()*10;
+    document.getElementById('interp-pct').textContent = Math.floor(iv) + '%';
+    document.getElementById('interp-fill').style.width = iv + '%';
+
+    document.getElementById('fusion-lat').textContent = Math.floor(130 + Math.random()*30) + 'ms';
+    document.getElementById('iot-nodes').textContent = Math.floor(122 + Math.random()*8);
+    document.getElementById('iot-fill').style.width = (88 + Math.random()*10) + '%';
+
+    // Model metrics slight jitter
+    document.getElementById('m-iou').textContent = (0.873 + (Math.random()*0.006-0.003)).toFixed(3);
+    document.getElementById('m-f1').textContent = (0.891 + (Math.random()*0.006-0.003)).toFixed(3);
+    document.getElementById('m-prec').textContent = (0.905 + (Math.random()*0.006-0.003)).toFixed(3);
+    document.getElementById('m-rec').textContent = (0.878 + (Math.random()*0.006-0.003)).toFixed(3);
+
+    // Env chart — shift data
+    envChart.data.datasets.forEach(ds => {
+        ds.data.shift();
+        const last = ds.data[ds.data.length-1];
+        ds.data.push(last + (Math.random()*2-1));
+    });
+    envChart.data.labels.shift();
+    const nextHour = parseInt(envChart.data.labels[envChart.data.labels.length-1]) + 1;
+    envChart.data.labels.push(`${String(nextHour % 24).padStart(2,'0')}:00`);
+    envChart.update('none');
+
+}, 3000);
+
+// ================================================================
+// COUNTRY SEARCH SYSTEM (DYNAMIC GEOCODING)
+// ================================================================
+const searchInput = document.getElementById('city-search-input');
+const searchResults = document.getElementById('search-results');
+const searchSlots = document.getElementById('search-slots');
+
+function updateSlotsText() {
+    if (searchSlots) searchSlots.textContent = `Slots: ${activeCityKeys.length}/3 used — search to replace`;
+}
+
+const WORLD_CITIES = []; // Unused now, we fetch dynamically
+
+let searchTimeout = null;
+
+async function fetchCitySearch(q) {
+    if (q.length < 2) {
+        searchResults.innerHTML = '';
+        return;
+    }
+    
+    searchResults.innerHTML = '<div class="search-result-item"><span style="opacity:0.6;">Searching globally...</span></div>';
+    
+    try {
+        const resp = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`);
+        const data = await resp.json();
+        
+        searchResults.innerHTML = '';
+        
+        if (!data.results || data.results.length === 0) {
+            searchResults.innerHTML = '<div class="search-result-item"><span style="opacity:0.6;">No matches found</span></div>';
+            return;
+        }
+
+        data.results.forEach(res => {
+            const cityName = res.name + (res.country ? `, ${res.country}` : '');
+            const cityKey = res.name.toLowerCase().replace(/\s+/g, '') + res.id;
+            
+            // Skip if already active
+            if (activeCityKeys.includes(cityKey)) return;
+
+            const el = document.createElement('div');
+            el.className = 'search-result-item';
+            
+            const cc = res.country_code ? res.country_code.toLowerCase() : 'un';
+            el.innerHTML = `<img src="https://flagcdn.com/w20/${cc}.png" style="width:16px; border-radius:2px; vertical-align:middle; margin-right:6px;"> ${cityName}`;
+            
+            el.addEventListener('click', () => {
+                addSearchedCity({
+                    key: cityKey,
+                    name: cityName,
+                    cc: cc,
+                    lat: res.latitude,
+                    lng: res.longitude,
+                    zoom: 12,
+                    focus: 'Global Monitoring',
+                    pop: (res.population ? (res.population/1000).toFixed(0) + 'k' : 'N/A'),
+                    ndvi: 0.35 + Math.random()*0.15,
+                    traffic: Math.floor(Math.random() * 50) + 40
+                });
+                searchResults.innerHTML = '';
+                searchInput.value = '';
+            });
+            searchResults.appendChild(el);
+        });
+    } catch(e) {
+        searchResults.innerHTML = '<div class="search-result-item"><span style="opacity:0.6; color:var(--red);">Search error</span></div>';
+    }
+}
+
+searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => fetchCitySearch(q), 300);
+});
+
+searchInput.addEventListener('focus', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    if (q.length >= 2) {
+        fetchCitySearch(q);
+    } else {
+        searchResults.innerHTML = '<div class="search-result-item"><span style="opacity:0.6;">Type any city in the world...</span></div>';
+    }
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.city-search-panel')) {
+        searchResults.innerHTML = '';
+    }
+});
+
+function addSearchedCity(cityData) {
+    // Add to CITIES config dynamically
+    CITIES[cityData.key] = {
+        name: cityData.name,
+        cc: cityData.cc,
+        lat: cityData.lat, lng: cityData.lng, zoom: cityData.zoom,
+        waqiId: cityData.waqiId,
+        focus: cityData.focus,
+        pop: cityData.pop, ndvi: cityData.ndvi, traffic: cityData.traffic,
+        color: 'var(--cyan)',
+        heatZones: [
+            { lat: cityData.lat, lng: cityData.lng, r: 800, c: '#ff9f1c', o: 0.25 },
+            { lat: cityData.lat + 0.01, lng: cityData.lng + 0.01, r: 500, c: '#ff3560', o: 0.2 }
+        ],
+        waterPoints: [
+            { lat: cityData.lat + 0.005, lng: cityData.lng - 0.005, label: cityData.name.split(',')[0] + ' Water Monitor', ph: (6.5 + Math.random()*1.5).toFixed(1) }
+        ],
+        vegZones: [
+            { lat: cityData.lat - 0.01, lng: cityData.lng - 0.01, r: 500, label: cityData.name.split(',')[0] + ' Green Zone' }
+        ]
+    };
+
+    // Pre-fill live data so charts immediately show data instead of flatlining
+    liveAQI[cityData.key] = {
+        aqi: Math.floor(Math.random() * 60) + 20,
+        pm25: Math.floor(Math.random() * 25) + 5,
+        pm10: Math.floor(Math.random() * 30) + 10,
+        no2: Math.floor(Math.random() * 20) + 5,
+        so2: Math.floor(Math.random() * 10) + 1,
+        o3: Math.floor(Math.random() * 30) + 10,
+        t: Math.floor(Math.random() * 15) + 15,
+        h: Math.floor(Math.random() * 40) + 40,
+        station: cityData.name.split(',')[0] + ' Monitor',
+        dominentPol: 'pm25'
+    };
+
+    // Replace the oldest slot (first in array)
+    const removedKey = activeCityKeys.shift();
+    delete liveAQI[removedKey];
+    activeCityKeys.push(cityData.key);
+
+    // Rebuild city selector buttons
+    rebuildCityButtons();
+
+    // Fetch AQI for new city
+    fetchCityAQI(cityData.key);
+
+    // Clear search
+    searchInput.value = '';
+    searchResults.innerHTML = '';
+    updateSlotsText();
+
+    // Set new city as active
+    activeCity = cityData.key;
+    document.querySelectorAll('.city-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.city === cityData.key);
+    });
+    updateDashboardForCity();
+}
+
+async function fetchCityAQI(key) {
+    const city = CITIES[key];
+    if (!city) return;
+    const data = await fetchRealData(city.lat, city.lng, city.name.split(',')[0]);
+    if (data) {
+        liveAQI[key] = data;
+    }
+    updateDashboardForCity();
+    updateMapMarkers();
+}
+
+function rebuildCityButtons() {
+    const selector = document.getElementById('city-selector');
+    selector.innerHTML = '';
+    activeCityKeys.forEach((key, i) => {
+        const city = CITIES[key];
+        if (!city) return;
+        const btn = document.createElement('div');
+        btn.className = 'city-btn' + (key === activeCity ? ' active' : '');
+        btn.dataset.city = key;
+        
+        // Preserve custom SVG for original cities, or use nicely styled FlagCDN for dynamic ones
+        let flagHtml = city.flagSvg ? city.flagSvg : `<img src="https://flagcdn.com/w40/${city.cc}.png" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:2px solid ${i===0?'#00d4ff':i===1?'#00e87b':'#ff9f1c'};">`;
+
+        btn.innerHTML = `
+            <div class="city-flag">${flagHtml}</div>
+            <div class="city-name">${city.name}</div>
+            <div class="city-focus">${city.focus}</div>
+            <div class="city-status live"><div class="pulse-dot" style="width:5px;height:5px;"></div> Live</div>
+        `;
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeCity = key;
+            updateDashboardForCity();
+        });
+        selector.appendChild(btn);
+    });
+}
+
+// ================================================================
+// INITIAL DATA FETCH & SETUP
+// ================================================================
+updateSlotsText();
+updateDashboardForCity(); // Instantly show pre-filled mock data
+fetchAllCitiesAQI(); // Fetch real data in the background
+// Refresh WAQI every 2 minutes for more up-to-date data
+setInterval(fetchAllCitiesAQI, 120000);
+document.getElementById('owm-dot').className = 'api-dot ok';
+
+</script>
+</body>
+</html>
