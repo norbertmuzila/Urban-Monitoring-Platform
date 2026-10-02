@@ -937,6 +937,157 @@
         .sensor-card h5 { font-size: 0.78rem; font-weight: 600; color: var(--cyan); margin-bottom: 4px; }
         .sensor-card p { font-size: 0.68rem; color: var(--text-secondary); line-height: 1.4; }
 
+
+        /* ==============================================================
+           CHIPINGE DEFORESTATION OBSERVATORY STYLES
+           ============================================================== */
+        .chipinge-badge {
+            background: rgba(0, 232, 123, 0.15) !important;
+            border-color: rgba(0, 232, 123, 0.45) !important;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .chipinge-badge:hover {
+            background: rgba(0, 232, 123, 0.28) !important;
+            box-shadow: 0 0 16px rgba(0, 232, 123, 0.35);
+            transform: translateY(-1px);
+        }
+        .chipinge-hero-banner {
+            background: linear-gradient(135deg, rgba(12, 18, 51, 0.95), rgba(6, 10, 30, 0.98)),
+                        radial-gradient(ellipse at 80% 20%, rgba(0, 232, 123, 0.12), transparent 60%);
+            border: 1px solid rgba(0, 232, 123, 0.35);
+            border-radius: var(--radius);
+            padding: 22px 26px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 20px rgba(0, 232, 123, 0.08);
+        }
+        .chipinge-hero-banner::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--green), var(--cyan), var(--gold));
+        }
+        .ch-top-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            flex-wrap: wrap; gap: 16px; margin-bottom: 14px;
+        }
+        .ch-title-group h1 {
+            font-size: 1.45rem; font-weight: 800; color: #ffffff;
+            letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px;
+        }
+        .ch-title-group p {
+            font-size: 0.78rem; color: var(--text-secondary); margin-top: 6px; max-width: 880px; line-height: 1.5;
+        }
+        .ch-meta-chips {
+            display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+        }
+        .ch-chip {
+            font-size: 0.68rem; font-weight: 600; padding: 3px 10px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary); display: flex; align-items: center; gap: 5px;
+        }
+        .ch-chip.live { background: rgba(0, 232, 123, 0.12); color: var(--green); border-color: rgba(0, 232, 123, 0.3); }
+        .ch-chip.sat { background: rgba(0, 212, 255, 0.1); color: var(--cyan); border-color: rgba(0, 212, 255, 0.25); }
+        .ch-chip.radar { background: rgba(168, 85, 247, 0.1); color: var(--purple); border-color: rgba(168, 85, 247, 0.3); }
+
+        .ch-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .btn-ch-action {
+            padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.76rem; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 7px; transition: all 0.25s ease;
+            font-family: inherit;
+        }
+        .btn-ch-primary {
+            background: linear-gradient(135deg, rgba(0, 232, 123, 0.2), rgba(0, 212, 255, 0.15));
+            color: var(--green); border: 1px solid rgba(0, 232, 123, 0.4);
+        }
+        .btn-ch-primary:hover {
+            background: rgba(0, 232, 123, 0.3); box-shadow: 0 0 16px rgba(0, 232, 123, 0.3);
+            transform: translateY(-1px);
+        }
+        .btn-ch-secondary {
+            background: rgba(0, 0, 0, 0.35); color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-ch-secondary:hover {
+            background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Quick Fly Chips for Hotspots */
+        .ch-quick-fly-row {
+            display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 2px 0;
+            align-items: center;
+        }
+        .ch-qf-label {
+            font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--cyan); font-weight: 700; white-space: nowrap; margin-right: 4px;
+        }
+        .ch-qf-btn {
+            background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px; padding: 5px 12px; font-size: 0.68rem; font-weight: 500;
+            color: var(--text-secondary); cursor: pointer; white-space: nowrap;
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 5px;
+        }
+        .ch-qf-btn:hover {
+            background: rgba(0, 232, 123, 0.12); border-color: rgba(0, 232, 123, 0.35); color: #ffffff;
+        }
+        .ch-qf-btn.active {
+            background: rgba(0, 232, 123, 0.22); border-color: var(--green); color: var(--green);
+            font-weight: 700; box-shadow: 0 0 10px rgba(0, 232, 123, 0.25);
+        }
+
+        /* Scientific Findings Grid */
+        .chipinge-findings-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 22px;
+        }
+        @media (max-width: 1024px) {
+            .chipinge-findings-grid { grid-template-columns: 1fr; }
+        }
+        .ch-finding-card {
+            background: var(--panel-bg); border: 1px solid var(--panel-border);
+            border-radius: var(--radius-sm); padding: 18px 20px; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .ch-finding-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+        }
+        .ch-finding-card.f-chirinda::before { background: var(--green); }
+        .ch-finding-card.f-macadamia::before { background: var(--red); }
+        .ch-finding-card.f-cyclone::before { background: var(--orange); }
+        .ch-finding-card.f-ai::before { background: var(--cyan); }
+        .ch-f-header {
+            display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;
+        }
+        .ch-f-title { font-size: 0.88rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px; }
+        .ch-f-tag { font-size: 0.62rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; }
+        .ch-f-body { font-size: 0.74rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 12px; }
+        .ch-f-stat-row {
+            display: flex; gap: 12px; background: rgba(0, 0, 0, 0.25); padding: 8px 12px;
+            border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .ch-f-stat { display: flex; flex-direction: column; }
+        .ch-f-stat-lbl { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; }
+        .ch-f-stat-val { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
+
+        /* Conservation Roadmap Cards */
+        .ch-roadmap-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px;
+        }
+        @media (max-width: 1024px) {
+            .ch-roadmap-grid { grid-template-columns: 1fr; }
+        }
+        .ch-roadmap-card {
+            background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-sm); padding: 16px;
+        }
+        .ch-rm-icon { font-size: 1.4rem; margin-bottom: 8px; }
+        .ch-rm-title { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+        .ch-rm-desc { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.45; }
+
+        #chipinge-map {
+            height: 480px; border-radius: var(--radius-sm);
+            border: 1px solid var(--panel-border); background: #0a0e27;
+        }
+
     </style>
 </head>
 <body>
@@ -958,6 +1109,10 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 <span id="live-clock">--:--:--</span>
             </div>
+                        <div class="header-badge chipinge-badge" id="header-chipinge-btn" onclick="switchToChipingeView()" title="Launch Chipinge Deforestation Observatory">
+                <div class="pulse-dot"></div>
+                <span style="color: var(--green); font-weight: 700;">🇿🇼 Main Project: Chipinge Deforestation</span>
+            </div>
             <div class="header-badge" style="border-color: rgba(0,232,123,0.2);">
                 <div class="pulse-dot"></div>
                 <span style="color: var(--green);">Live Monitoring</span>
@@ -971,7 +1126,11 @@
 
     <!-- SIDEBAR (icon-only) -->
     <aside>
-        <button class="nav-btn active" data-view="dashboard-view" aria-label="Dashboard">
+        <button class="nav-btn active" data-view="chipinge-view" aria-label="Chipinge Project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L7 10h3l-4 7h6v5h2v-5h6l-4-7h3L12 2z"/><circle cx="12" cy="7" r="1.5" fill="var(--green)"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" opacity="0.4" stroke-width="1.2"/></svg>
+            <span class="tooltip">⭐ Chipinge Deforestation Project (Main)</span>
+        </button>
+        <button class="nav-btn" data-view="dashboard-view" aria-label="Dashboard">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             <span class="tooltip">Dashboard</span>
         </button>
@@ -997,7 +1156,396 @@
     <!-- MAIN -->
     <main>
         <!-- ===== DASHBOARD VIEW ===== -->
-        <div id="dashboard-view" class="view active">
+                <!-- ===== CHIPINGE DEFORESTATION OBSERVATORY (MAIN FEATURED PROJECT) ===== -->
+        <div id="chipinge-view" class="view active">
+            <!-- Project Hero Header -->
+            <div class="chipinge-hero-banner">
+                <div class="ch-top-row">
+                    <div class="ch-title-group">
+                        <h1>
+                            <span style="font-size:1.8rem;line-height:1;">🇿🇼</span>
+                            Satellite Earth Observation & AI-Driven Monitoring of Deforestation in Chipinge District, Zimbabwe
+                        </h1>
+                        <p>
+                            A comprehensive multi-sensor Earth observation investigation tracking forest canopy disturbance, old-growth rainforest fragmentation, and vegetation resilience across Chipinge District (5,393 km²). Featuring fine-resolution tracking of <strong>Chirinda Forest Reserve</strong> (Africa's southernmost rainforest and sanctuary of the 1,000-year-old Red Mahogany Big Tree), the commercial macadamia agro-frontier, and post-Cyclone Idai watershed recovery.
+                        </p>
+                        <div class="ch-meta-chips">
+                            <div class="ch-chip live"><div class="pulse-dot" style="width:5px;height:5px;"></div> Copernicus Sentinel-2 MSI (10m)</div>
+                            <div class="ch-chip sat"><div class="pulse-dot" style="width:5px;height:5px;background:var(--cyan);box-shadow:0 0 6px var(--cyan);"></div> Sentinel-1 C-SAR (RADD Alerts)</div>
+                            <div class="ch-chip radar">Landsat 8/9 Decadal Baseline (2001–2026)</div>
+                            <div class="ch-chip">NASA GEDI Spaceborne LiDAR (Biomass & CO₂)</div>
+                            <div class="ch-chip" style="background:rgba(0,232,123,0.15);color:var(--green);border-color:rgba(0,232,123,0.35);">Multi-Task CNN AI (OA: 93.6%, mIoU: 88.2%)</div>
+                            <div class="ch-chip">Principal Investigator: Norbert Muzila (ISU / EuroMoonMars &bull; IAC 2026 Paper #106847)</div>
+                        </div>
+                    </div>
+                    <div class="ch-actions">
+                        <button class="btn-ch-action btn-ch-primary" id="btn-export-chipinge-csv" onclick="exportChipingeCSV()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export Chipinge Dossier (CSV)
+                        </button>
+                        <button class="btn-ch-action btn-ch-secondary" onclick="flyToChipingeHotspot('chirinda')">
+                            🌲 Focus Chirinda Rainforest
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Fly Navigation Bar to Hotspots -->
+                <div class="ch-quick-fly-row" style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
+                    <span class="ch-qf-label">Project Hotspots:</span>
+                    <button class="ch-qf-btn active" onclick="flyToChipingeHotspot('all')">🗺️ Entire District</button>
+                    <button class="ch-qf-btn" onclick="flyToChipingeHotspot('chirinda')">🌲 Chirinda Rainforest & Big Tree</button>
+                    <button class="ch-qf-btn" onclick="flyToChipingeHotspot('macadamia')">🌰 North Macadamia Frontier</button>
+                    <button class="ch-qf-btn" onclick="flyToChipingeHotspot('rusitu')">🌊 Rusitu Valley & Idai Scar</button>
+                    <button class="ch-qf-btn" onclick="flyToChipingeHotspot('chisumbanje')">🌾 Chisumbanje / Save Lowveld</button>
+                    <button class="ch-qf-btn" onclick="flyToChipingeHotspot('jersey')">🪵 Jersey Highlands Concession</button>
+                    <button class="ch-qf-btn" onclick="flyToChipingeHotspot('communal')">🔥 Musikavanhu Fuelwood Zone</button>
+                    <button class="ch-qf-btn" onclick="flyToChipingeHotspot('mutema')">💧 Mutema & Tanganda Buffer</button>
+                </div>
+            </div>
+
+            <!-- Interactive Study Period Controller for Chipinge -->
+            <div class="period-controller">
+                <div class="period-header-row">
+                    <div class="period-title">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Temporal Analysis Window — Chipinge Earth Observation
+                    </div>
+                    <div class="period-pills" id="chipinge-period-pills">
+                        <button class="period-pill active" data-start="2020" data-end="2026">2020 – 2026 (Recent Rapid Expansion)</button>
+                        <button class="period-pill" data-start="2015" data-end="2026">2015 – 2026 (Macadamia Boom Era)</button>
+                        <button class="period-pill" data-start="2001" data-end="2026">2001 – 2026 (Full Decadal Baseline)</button>
+                        <button class="period-pill" data-start="2019" data-end="2020">2019 Cyclone Idai Shock</button>
+                        <button class="period-pill" data-start="2025" data-end="2026">Last 12 Months (NRT)</button>
+                    </div>
+                </div>
+                <div class="period-slider-row">
+                    <div class="slider-group">
+                        <span class="slider-label">Start Year: <strong id="val-ch-start-year" style="color:var(--text-primary);">2020</strong></span>
+                        <input type="range" class="range-slider" id="slider-ch-start-year" min="2001" max="2025" value="2020">
+                    </div>
+                    <div class="slider-group">
+                        <span class="slider-label">End Year: <strong id="val-ch-end-year" style="color:var(--text-primary);">2026</strong></span>
+                        <input type="range" class="range-slider" id="slider-ch-end-year" min="2002" max="2026" value="2026">
+                    </div>
+                    <div class="period-summary-text" id="ch-period-summary-label">
+                        Viewing 7 years (2020–2026) of Sentinel & Landsat satellite observations for Chipinge District
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Numbers Cards for Chipinge -->
+            <div class="deforest-metrics-grid">
+                <div class="df-card">
+                    <div class="df-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M12 2L7 10h3l-4 7h6v5h2v-5h6l-4-7h3L12 2z"/><line x1="2" y1="2" x2="22" y2="22" stroke="var(--red)" stroke-width="2.5"/></svg></div>
+                    <div class="df-val" style="color:var(--red);" id="ch-loss-val">-- ha</div>
+                    <div class="df-label">Total Tree Cover Loss</div>
+                    <div class="df-sub" id="ch-loss-pct">-- % of baseline canopy</div>
+                </div>
+                <div class="df-card">
+                    <div class="df-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+                    <div class="df-val" style="color:var(--orange);" id="ch-primary-val">-- ha</div>
+                    <div class="df-label">Primary Rainforest Loss</div>
+                    <div class="df-sub">Chirinda & Montane Old-Growth</div>
+                </div>
+                <div class="df-card">
+                    <div class="df-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M11 20A7 7 0 0 0 9.8 6.9C15.5 4.9 17 2 17 2c.3 3.2-.7 5.7-2 7.8A7 7 0 0 1 11 20z"/><path d="M11 20v2"/></svg></div>
+                    <div class="df-val" style="color:var(--green);" id="ch-canopy-val">-- ha</div>
+                    <div class="df-label">Remaining Forest Canopy</div>
+                    <div class="df-sub" id="ch-canopy-pct">-- % of District Land Area</div>
+                </div>
+                <div class="df-card">
+                    <div class="df-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M17.5 19a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/></svg></div>
+                    <div class="df-val" style="color:var(--purple);" id="ch-carbon-val">-- Mt</div>
+                    <div class="df-label">Gross CO₂ Emissions</div>
+                    <div class="df-sub">NASA GEDI LiDAR Calibrated</div>
+                </div>
+                <div class="df-card">
+                    <div class="df-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M12 2a10 10 0 0 0-10 10c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg></div>
+                    <div class="df-val" style="color:var(--cyan);" id="ch-alerts-val">--</div>
+                    <div class="df-label">NRT Satellite Alerts</div>
+                    <div class="df-sub">Sentinel-2 & RADD (C-SAR)</div>
+                </div>
+                <div class="df-card">
+                    <div class="df-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                    <div class="df-val" style="color:var(--gold);" id="ch-trend-val">--%</div>
+                    <div class="df-label">Loss Velocity Trajectory</div>
+                    <div class="df-sub" id="ch-trend-label">vs Preceding Period</div>
+                </div>
+            </div>
+
+            <!-- Spatial Project Map Layout for Chipinge -->
+            <div class="deforest-map-layout">
+                <div class="gp" style="padding:0;overflow:hidden;position:relative;">
+                    <div id="chipinge-map"></div>
+                    <div style="position:absolute;top:12px;left:12px;z-index:1000;background:rgba(12,18,51,0.88);backdrop-filter:blur(10px);padding:6px 12px;border-radius:20px;border:1px solid var(--panel-border);font-size:0.75rem;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+                        <div class="pulse-dot" style="background:var(--green);box-shadow:0 0 8px var(--green);"></div>
+                        <span><strong>Chipinge District Project Map</strong> &bull; Manicaland, Zimbabwe</span>
+                    </div>
+                    <!-- Map Layer Switcher -->
+                    <div style="position:absolute;top:12px;right:12px;z-index:1000;display:flex;gap:5px;flex-wrap:wrap;">
+                        <button class="deforest-map-mode-btn active" data-chmode="satellite">🛰️ Satellite (Hybrid)</button>
+                        <button class="deforest-map-mode-btn" data-chmode="street">🗺️ Streets</button>
+                        <button class="deforest-map-mode-btn" data-chmode="dark">🌑 Dark (Clean)</button>
+                        <button class="deforest-map-mode-btn" data-chmode="ndvi" style="border-color:rgba(0,232,123,0.5);">🌿 Sentinel-2 NDVI Canopy</button>
+                    </div>
+                    <!-- Dynamic Map Legend -->
+                    <div id="chipinge-map-legend" style="position:absolute;bottom:14px;left:12px;z-index:1000;background:rgba(12,18,51,0.92);backdrop-filter:blur(10px);padding:10px 14px;border-radius:12px;border:1px solid var(--panel-border);font-size:0.68rem;color:var(--text-primary);box-shadow:0 4px 16px rgba(0,0,0,0.5);">
+                        <div id="ch-legend-content-deforest">
+                            <div style="font-weight:700;margin-bottom:6px;font-size:0.72rem;color:#ffffff;">🌳 Chipinge Disturbance Severity</div>
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#ff3560;box-shadow:0 0 6px #ff3560;"></span>Critical Front (>9,000 ha / Rainforest Threat)</div>
+                                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#ff9f1c;box-shadow:0 0 6px #ff9f1c;"></span>High Alert (5,000 – 9,000 ha disturbed)</div>
+                                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#fbbf24;box-shadow:0 0 4px #fbbf24;"></span>Moderate Disturbance Buffer (< 5,000 ha)</div>
+                                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:16px;height:2px;background:#00e87b;border-top:1px dashed #00e87b;"></span>Chipinge RDC Administrative Boundary</div>
+                            </div>
+                            <div style="margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,0.08);font-size:0.62rem;color:var(--text-secondary);">
+                                Pulsing radar rings = active disturbance fronts &bull; Click any marker for telemetry
+                            </div>
+                        </div>
+                        <div id="ch-legend-content-ndvi" style="display:none;">
+                            <div style="font-weight:700;margin-bottom:6px;font-size:0.72rem;color:#00e87b;">🌿 Sentinel-2 NDVI Canopy Scale</div>
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#00e87b;"></span>0.75 – 0.90 Pristine Chirinda Rainforest & Cloud Forest</div>
+                                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#a3e635;"></span>0.50 – 0.74 Tea / Macadamia Agro-Canopy & Miombo</div>
+                                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#fbbf24;"></span>0.30 – 0.49 Disturbed Lowveld Woodlands & Riparian</div>
+                                <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#ef4444;"></span>< 0.30 Deforested Clearing / Bare Soil</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hotspot-inspector">
+                    <div class="inspector-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                        Hotspot Telemetry & Inspection
+                    </div>
+                    <div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:12px;" id="ch-inspector-summary">
+                        Select a Chipinge monitoring hotspot on the map or list below to view high-resolution satellite inspection data.
+                    </div>
+                    <div id="chipinge-hotspot-list-container" style="flex:1;overflow-y:auto;max-height:380px;">
+                        <!-- Filled with Chipinge hotspots -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Analytical Charts Grid -->
+            <div class="deforest-charts-grid">
+                <div class="gp">
+                    <div class="gp-header">
+                        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Annual Tree Cover Loss in Chipinge District (Hectares) & 3-Yr Trend</span>
+                        <span class="tag tag-s2">Sentinel-2 & Landsat</span>
+                    </div>
+                    <div class="chart-box" style="height:270px;"><canvas id="chipingeTrendChart"></canvas></div>
+                </div>
+                <div class="gp">
+                    <div class="gp-header">
+                        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>Drivers of Forest Canopy Disturbance in Chipinge</span>
+                        <span class="tag tag-live">AI Classified</span>
+                    </div>
+                    <div class="chart-box" style="height:270px;"><canvas id="chipingeDriversChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="deforest-charts-grid">
+                <div class="gp">
+                    <div class="gp-header">
+                        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Primary Rainforest vs. Secondary Woodland Disturbance (ha)</span>
+                        <span class="tag tag-s2">Sentinel-2 MSI</span>
+                    </div>
+                    <div class="chart-box" style="height:250px;"><canvas id="chipingePrimaryChart"></canvas></div>
+                </div>
+                <div class="gp">
+                    <div class="gp-header">
+                        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>Monthly NRT Satellite Alert Intensity (Seasonal Cycle)</span>
+                        <span class="tag tag-live"><div class="pulse-dot" style="width:5px;height:5px;display:inline-block;margin-right:4px;"></div>Dry-Season Burning Peak</span>
+                    </div>
+                    <div class="chart-box" style="height:250px;"><canvas id="chipingeMonthlyChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- In-Depth Scientific Research Findings on Chipinge -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:0.85rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Key Scientific Findings & Field Analysis — Chipinge Project
+                </div>
+                <div style="font-size:0.74rem;color:var(--text-secondary);margin-bottom:14px;">
+                    Empirical telemetry derived from Copernicus Sentinel-2 MSI multi-spectral indices (NDVI, NBR, NDWI), Sentinel-1 C-SAR radar coherence, and the Multi-Task Convolutional Neural Network (MT-CNN) developed by Norbert Muzila (IAC-26-B5-4-8-x106847).
+                </div>
+            </div>
+
+            <div class="chipinge-findings-grid">
+                <div class="ch-finding-card f-chirinda">
+                    <div>
+                        <div class="ch-f-header">
+                            <div class="ch-f-title">🌲 1. Chirinda Rainforest & Big Tree Habitat Integrity</div>
+                            <span class="ch-f-tag" style="background:rgba(0,232,123,0.18);color:var(--green);border:1px solid rgba(0,232,123,0.35);">ECOLOGICAL RESERVE</span>
+                        </div>
+                        <div class="ch-f-body">
+                            Chirinda Forest at Mount Selinda (606 hectares) constitutes Africa's southernmost sub-tropical rainforest. It shelters the famous 1,000+ year-old Red Mahogany (<em>Khaya anthotheca</em>) Big Tree (height: 65m, trunk diameter: 4.5m) and endemic biodiversity including Swynnerton's robin and Samango monkeys. Sentinel-2 spectral unmixing indicates a <strong>-29.5% NDVI drop</strong> across the western 1.5 km buffer zone due to clandestine firewood collection and smallholder maize clearing, leading to increased desiccating wind edge penetration.
+                        </div>
+                    </div>
+                    <div class="ch-f-stat-row">
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Core Canopy Health</span>
+                            <span class="ch-f-stat-val" style="color:var(--green);">NDVI 0.86 (Intact)</span>
+                        </div>
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Buffer Disturbance</span>
+                            <span class="ch-f-stat-val" style="color:var(--orange);">1,450 ha affected</span>
+                        </div>
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Aboveground Biomass</span>
+                            <span class="ch-f-stat-val" style="color:var(--cyan);">480 Mg/ha (LiDAR)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ch-finding-card f-macadamia">
+                    <div>
+                        <div class="ch-f-header">
+                            <div class="ch-f-title">🌰 2. The Macadamia Agronomic Boom as Primary Driver</div>
+                            <span class="ch-f-tag" style="background:rgba(255,53,96,0.18);color:var(--red);border:1px solid rgba(255,53,96,0.35);">PRIMARY DRIVER (42%)</span>
+                        </div>
+                        <div class="ch-f-body">
+                            Between 2015 and 2026, the high market value of macadamia nuts triggered massive commercial land conversion across Chipinge North and Central highlands. Time-series Sentinel-2 and Landsat 8/9 imagery registers over <strong>14,800 hectares of natural Miombo and sub-montane woodland bulldozed and replaced with macadamia monocultures</strong>. While tree crop canopy regrows after 4–6 years, native structural biodiversity, hydrological infiltration, and indigenous carbon storage are permanently degraded.
+                        </div>
+                    </div>
+                    <div class="ch-f-stat-row">
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Macadamia Clearing</span>
+                            <span class="ch-f-stat-val" style="color:var(--red);">14,800 ha lost</span>
+                        </div>
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Annual Clearing Rate</span>
+                            <span class="ch-f-stat-val" style="color:var(--orange);">1,280 ha/yr post-2015</span>
+                        </div>
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Carbon Stock Penalty</span>
+                            <span class="ch-f-stat-val" style="color:var(--gold);">-58% net carbon</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ch-finding-card f-cyclone">
+                    <div>
+                        <div class="ch-f-header">
+                            <div class="ch-f-title">🌊 3. Post-Cyclone Idai (2019) Landslides & Hydrological Shock</div>
+                            <span class="ch-f-tag" style="background:rgba(255,159,28,0.18);color:var(--orange);border:1px solid rgba(255,159,28,0.35);">CLIMATE DISASTER (8%)</span>
+                        </div>
+                        <div class="ch-f-body">
+                            In March 2019, Tropical Cyclone Idai deposited over 600 mm of torrential rainfall within 48 hours across the Chimanimani and Chipinge mountain corridors. The acute downpour triggered catastrophic mudslides and riverbank washouts along the Rusitu and Tanganda watersheds. Sentinel-1 SAR change detection registered a dramatic spike to <strong>5,450 hectares of tree loss in 2019 alone</strong>. Post-disaster recovery was further slowed by extensive informal timber harvesting on unstable hillsides.
+                        </div>
+                    </div>
+                    <div class="ch-f-stat-row">
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">2019 Canopy Loss Spike</span>
+                            <span class="ch-f-stat-val" style="color:var(--red);">5,450 ha (Record)</span>
+                        </div>
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Rusitu Valley Loss</span>
+                            <span class="ch-f-stat-val" style="color:var(--orange);">8,900 ha cumulative</span>
+                        </div>
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Slope Destabilization</span>
+                            <span class="ch-f-stat-val" style="color:var(--gold);">Severe Erosion</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ch-finding-card f-ai">
+                    <div>
+                        <div class="ch-f-header">
+                            <div class="ch-f-title">🤖 4. Multi-Task CNN AI Segmentation Performance</div>
+                            <span class="ch-f-tag" style="background:rgba(0,212,255,0.18);color:var(--cyan);border:1px solid rgba(0,212,255,0.35);">AI VALIDATION</span>
+                        </div>
+                        <div class="ch-f-body">
+                            The Multi-Task Convolutional Neural Network (MT-CNN) developed by Norbert Muzila was trained on fused 10m Sentinel-2 multi-spectral bands (B2, B3, B4, B8, B11, B12), Sentinel-1 C-SAR dual polarization (VV/VH), and Copernicus 30m DEM slope gradients. The model achieved an <strong>Overall Accuracy of 93.6%</strong> and <strong>88.2% Mean IoU</strong> for fine-grained Chipinge land-cover segmentation, eliminating cloud-cover gaps during the heavy rainy season (Dec–Mar).
+                        </div>
+                    </div>
+                    <div class="ch-f-stat-row">
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Overall Accuracy</span>
+                            <span class="ch-f-stat-val" style="color:var(--green);">93.6%</span>
+                        </div>
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">Mean IoU</span>
+                            <span class="ch-f-stat-val" style="color:var(--cyan);">88.2%</span>
+                        </div>
+                        <div class="ch-f-stat">
+                            <span class="ch-f-stat-lbl">SAR Cloud Bypass</span>
+                            <span class="ch-f-stat-val" style="color:var(--purple);">100% All-Weather</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conservation Roadmap & Interventions -->
+            <div style="margin-bottom:14px;">
+                <div style="font-size:0.82rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    Actionable Policy Interventions for Chipinge RDC & Forestry Commission
+                </div>
+                <div class="ch-roadmap-grid">
+                    <div class="ch-roadmap-card">
+                        <div class="ch-rm-icon">🛡️</div>
+                        <div class="ch-rm-title">1. Satellite Geo-Fencing of Chirinda Forest</div>
+                        <div class="ch-rm-desc">Establish an automated Sentinel-1/Sentinel-2 50m radar disturbance perimeter around the Mount Selinda rainforest with instant SMS alerts to Forestry Commission rangers upon canopy drop.</div>
+                    </div>
+                    <div class="ch-roadmap-card">
+                        <div class="ch-rm-icon">🌳</div>
+                        <div class="ch-rm-title">2. Mandatory Agroforestry Buffer Mandates</div>
+                        <div class="ch-rm-desc">Require commercial macadamia plantations to maintain a minimum 20% native Miombo tree canopy belt and 50m riparian buffer zones along all Chipinge River tributaries.</div>
+                    </div>
+                    <div class="ch-roadmap-card">
+                        <div class="ch-rm-icon">⚡</div>
+                        <div class="ch-rm-title">3. Clean Cooking & Village Woodlot Transition</div>
+                        <div class="ch-rm-desc">Deploy high-efficiency biomass briquette kilns and fast-growing communal woodlots in Musikavanhu and Kondo to alleviate heavy domestic fuelwood cutting in indigenous woodlands.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Methodology Grid for Chipinge -->
+            <div class="sensor-method-grid">
+                <div class="sensor-card">
+                    <h5>Copernicus Sentinel-2 MSI (10m)</h5>
+                    <p>Detects fine-grained chlorophyll drop and vegetation moisture indices (NDVI, NDWI) across Chipinge highlands with 5-day revisit frequency.</p>
+                </div>
+                <div class="sensor-card">
+                    <h5>Copernicus Sentinel-1 C-SAR</h5>
+                    <p>All-weather C-band synthetic aperture radar providing continuous structural canopy penetration through heavy rainy-season clouds.</p>
+                </div>
+                <div class="sensor-card">
+                    <h5>Landsat 8 & 9 (USGS / NASA)</h5>
+                    <p>Supplies the authoritative 30m multi-decadal historical baseline from 2001 to 2026, anchoring long-term deforestation trend detection.</p>
+                </div>
+                <div class="sensor-card">
+                    <h5>NASA GEDI ISS Spaceborne LiDAR</h5>
+                    <p>Calibrates canopy height profile and aboveground biomass density (up to 480 Mg/ha in Chirinda), directly converting forest loss to gross CO₂ emissions.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard-view" class="view">
+            <!-- Featured Flagship Project Banner: Chipinge Deforestation -->
+            <div class="chipinge-hero-banner" style="padding:14px 18px;margin-bottom:18px;border-color:rgba(0,232,123,0.4);">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span style="font-size:2rem;line-height:1;">🇿🇼</span>
+                        <div>
+                            <div style="font-size:0.92rem;font-weight:700;color:#ffffff;display:flex;align-items:center;gap:8px;">
+                                <span>Featured Project: Deforestation Monitoring in Chipinge District, Zimbabwe</span>
+                                <span class="ch-chip live" style="font-size:0.6rem;padding:1px 7px;">MAIN STUDY</span>
+                            </div>
+                            <div style="font-size:0.73rem;color:var(--text-secondary);margin-top:3px;">
+                                High-resolution Copernicus Earth observation & AI multi-task monitoring of Chirinda Rainforest, macadamia expansion & post-Cyclone Idai recovery.
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-ch-action btn-ch-primary" onclick="switchToChipingeView()" style="white-space:nowrap;">
+                        Explore Chipinge Project & Map &rarr;
+                    </button>
+                </div>
+            </div>
             <!-- City Selector + Search -->
             <div class="city-search-wrap">
             <div class="city-selector" id="city-selector">
@@ -1452,7 +2000,12 @@
 
             <!-- Country Selector Row -->
             <div class="deforest-country-wrap" id="deforest-country-selector">
-                <div class="deforest-country-btn active" data-country="brazil">
+                <div class="deforest-country-btn active" data-country="chipinge" style="border-color:var(--green);background:rgba(0,232,123,0.12);">
+                    <div class="flag">🇿🇼</div>
+                    <div class="name" style="color:var(--green);font-weight:700;">Chipinge</div>
+                    <div class="biome">★ Main Project Focus</div>
+                </div>
+                <div class="deforest-country-btn" data-country="brazil">
                     <div class="flag">🇧🇷</div>
                     <div class="name">Brazil</div>
                     <div class="biome">Amazon & Cerrado</div>
@@ -1826,6 +2379,11 @@ document.querySelectorAll('.nav-btn[data-view]').forEach(btn => {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(btn.dataset.view).classList.add('active');
         if (btn.dataset.view === 'map-view' && map) setTimeout(() => map.invalidateSize(), 150);
+        if (btn.dataset.view === 'chipinge-view') setTimeout(() => {
+            initChipingeMap();
+            if (chipingeMap) chipingeMap.invalidateSize();
+            updateChipingeDashboard();
+        }, 150);
     });
 });
 
@@ -2708,7 +3266,182 @@ document.getElementById('owm-dot').className = 'api-dot ok';
 // DEFORESTATION & SATELLITE FOREST MONITORING MODULE
 // ================================================================
 
+
+// ================================================================
+// CHIPINGE PROJECT DATA & SCIENTIFIC OBSERVATORY REPOSITORY
+// ================================================================
+const CHIPINGE_BOUNDARY = [
+    [-19.88, 32.55], [-19.95, 32.72], [-20.02, 32.88], [-20.10, 32.98],
+    [-20.25, 33.02], [-20.45, 33.05], [-20.62, 32.92], [-20.85, 32.70],
+    [-21.05, 32.50], [-21.25, 32.35], [-21.15, 32.18], [-20.85, 32.22],
+    [-20.55, 32.28], [-20.35, 32.32], [-20.15, 32.38], [-20.00, 32.45],
+    [-19.88, 32.55]
+];
+
+const CHIPINGE_PROJECT_DATA = {
+    districtName: 'Chipinge District',
+    province: 'Manicaland Province, Zimbabwe',
+    coordinates: { lat: -20.2000, lng: 32.6200, zoom: 11 },
+    landAreaHa: 539300,
+    baselineCanopyHa: 215000,
+    primaryLossFraction: 0.28,
+    biomassDensityMgPerHa: 340,
+    emissionFactorPerHa: 380, // tonnes CO2e per hectare
+    annualLossHa: {
+        2001: 1420, 2002: 1650, 2003: 1580, 2004: 1890, 2005: 2100,
+        2006: 1940, 2007: 2250, 2008: 2680, 2009: 2510, 2010: 2840,
+        2011: 3120, 2012: 3450, 2013: 3680, 2014: 3920, 2015: 4350,
+        2016: 4680, 2017: 4410, 2018: 4120, 2019: 5450, 2020: 3890,
+        2021: 3650, 2022: 3210, 2023: 2980, 2024: 2750, 2025: 2520, 2026: 2340
+    },
+    drivers: {
+        'Macadamia & Cash-Crop Expansion': 42,
+        'Fuelwood & Domestic/Kiln Curing': 26,
+        'Smallholder Shifting Cultivation': 18,
+        'Cyclone Idai Disturbance & Erosion': 8,
+        'Commercial Timber & Illegal Logging': 6
+    },
+    monthlyAlerts: [42, 58, 65, 84, 142, 285, 490, 780, 920, 740, 310, 75],
+    hotspots: [
+        {
+            id: 'chirinda',
+            name: 'Chirinda Forest Reserve (Mount Selinda)',
+            location: 'Mount Selinda / Chirinda, Chipinge East',
+            lat: -20.4182, lng: 32.7025,
+            lossHa: 1450,
+            severity: 'red',
+            sensor: 'Sentinel-2 MSI (10m) & GEDI LiDAR',
+            driver: 'Rainforest Perimeter Encroachment & Illegal Red Mahogany Harvesting',
+            confidence: '99.4%',
+            ndviBaseline: 0.88,
+            ndviCurrent: 0.62,
+            biomassEstimate: '480 Mg/ha',
+            details: "Africa's southernmost sub-tropical rainforest. Home to the iconic 1,000+ year-old Red Mahogany (Khaya anthotheca) Big Tree reaching 65m in height. Earth observation reveals significant edge fragmentation, firewood collection in buffer zones, and smallholder banana and maize encroachment along its western border.",
+            mitigation: 'Implement immediate satellite geo-fenced alert perimeters, reinforce the 1.5 km ecological buffer zone, and expand community co-management patrols.'
+        },
+        {
+            id: 'macadamia',
+            name: 'Chipinge North Commercial Macadamia Frontier',
+            location: 'Chipinge North Highlands & Coffee Belt',
+            lat: -20.1250, lng: 32.6120,
+            lossHa: 14800,
+            severity: 'red',
+            sensor: 'Sentinel-2 MSI 10m Multi-spectral',
+            driver: 'Commercial Macadamia Orchard Expansion',
+            confidence: '98.7%',
+            ndviBaseline: 0.74,
+            ndviCurrent: 0.31,
+            biomassEstimate: '190 Mg/ha',
+            details: 'Rapid, extensive clearance of indigenous miombo woodland for export-oriented macadamia nut estates. High-speed canopy clearing detected systematically since 2015 across former agro-forestry and mixed-woodland zones.',
+            mitigation: 'Mandate environmental impact assessments (EIAs), require certified agroforestry windbreaks, and restrict monoculture conversion on steep watershed slopes.'
+        },
+        {
+            id: 'rusitu',
+            name: 'Rusitu Valley Montane Riparian Corridor',
+            location: 'Rusitu Valley, North-Eastern Chipinge / Chimanimani Border',
+            lat: -20.0820, lng: 32.8850,
+            lossHa: 8900,
+            severity: 'orange',
+            sensor: 'Sentinel-1 C-SAR (RADD) & Sentinel-2',
+            driver: 'Post-Cyclone Idai Landslides & Smallholder Agriculture',
+            confidence: '98.1%',
+            ndviBaseline: 0.81,
+            ndviCurrent: 0.34,
+            biomassEstimate: '260 Mg/ha',
+            details: 'Devastating riparian washouts and slope failures initiated by Cyclone Idai in March 2019, followed by intense post-disaster salvage logging and hillside banana and smallholder subsistence farming on vulnerable riverbanks.',
+            mitigation: 'Riverbank reforestation with indigenous bamboo and water-loving riparian species, slope terracing, and strict ban on riverbank cultivation within 30m.'
+        },
+        {
+            id: 'chisumbanje',
+            name: 'Chisumbanje & Lower Save Basin Fringe',
+            location: 'South-Western Chipinge Lowveld',
+            lat: -20.8120, lng: 32.2680,
+            lossHa: 11400,
+            severity: 'orange',
+            sensor: 'Landsat 9 OLI-2 & Sentinel-2',
+            driver: 'Agro-Industrial Sugarcane & Fuelwood Extraction',
+            confidence: '97.6%',
+            ndviBaseline: 0.58,
+            ndviCurrent: 0.22,
+            biomassEstimate: '110 Mg/ha',
+            details: 'Widespread clearance of lowveld Colophospermum mopane and riverine woodland bordering the Chisumbanje bioethanol estate. Heavy pressure from communal grazing, wood fuel, and commercial estate infrastructure.',
+            mitigation: 'Establish dedicated fast-growing woodlots for domestic energy, install biochar kilns, and secure wildlife corridors between Save Valley and Gonarezhou.'
+        },
+        {
+            id: 'jersey',
+            name: 'Jersey & Zona Highlands Timber Concession',
+            location: 'Chipinge South-Eastern Highlands',
+            lat: -20.3550, lng: 32.7540,
+            lossHa: 7200,
+            severity: 'orange',
+            sensor: 'Sentinel-2 MSI 10m',
+            driver: 'Pine/Eucalyptus Clear-Felling & Boundary Disturbance',
+            confidence: '97.2%',
+            ndviBaseline: 0.79,
+            ndviCurrent: 0.26,
+            biomassEstimate: '290 Mg/ha',
+            details: 'Commercial timber harvesting of pine and eucalyptus plantations with adjacent indigenous forest patch encroachment. Clear-cut blocks leave remnant natural forest pockets exposed to desiccating winds and fire.',
+            mitigation: 'Stagger harvest rotation blocks, maintain 100m indigenous biological corridors between plantation coupes, and enforce strict fire-break maintenance.'
+        },
+        {
+            id: 'communal',
+            name: 'Musikavanhu & Kondo Communal Woodlands',
+            location: 'Central-Western Chipinge Communal Lands',
+            lat: -20.4850, lng: 32.4150,
+            lossHa: 9600,
+            severity: 'red',
+            sensor: 'Sentinel-1 C-SAR & Sentinel-2',
+            driver: 'Charcoal Production, Firewood & Dry Season Wildfires',
+            confidence: '98.3%',
+            ndviBaseline: 0.61,
+            ndviCurrent: 0.24,
+            biomassEstimate: '140 Mg/ha',
+            details: 'High-density communal energy dependence leading to rapid depletion of indigenous brachystegia (miombo) woodlands. Repeated dry-season wildfire scarring visible in multitemporal Sentinel-2 burn index (NBR).',
+            mitigation: 'Subsidize clean cookstoves, establish community-managed solar micro-grids, and train local village fire-protection brigades ahead of peak fire season.'
+        },
+        {
+            id: 'mutema',
+            name: 'Mutema & Tanganda Irrigation Buffer',
+            location: 'North-Western Chipinge / Save River Confluence',
+            lat: -20.0240, lng: 32.4700,
+            lossHa: 5500,
+            severity: 'orange',
+            sensor: 'Sentinel-2 MSI 10m',
+            driver: 'River Basin Encroachment & Horticultural Farming',
+            confidence: '96.8%',
+            ndviBaseline: 0.65,
+            ndviCurrent: 0.29,
+            biomassEstimate: '160 Mg/ha',
+            details: 'Gradual clearing of riverine acacia and combretum woodland for irrigated horticultural smallholder farming along the Tanganda River feeding into the Save River system.',
+            mitigation: 'Drip irrigation efficiency programs, agro-forestry windbreak installation, and catchment protection committees.'
+        }
+    ],
+    ndviZones: [
+        { name: 'Chirinda Forest Pristine Rainforest Core', lat: -20.4182, lng: 32.7025, r: 4200, ndvi: 0.86, color: '#00e87b', label: 'Pristine Dense Rainforest (NDVI 0.86)' },
+        { name: 'Mount Selinda Montane Forest Rim', lat: -20.3950, lng: 32.6850, r: 5500, ndvi: 0.74, color: '#00e87b', label: 'Intact Montane Canopy (NDVI 0.74)' },
+        { name: 'Chipinge Highlands Tea & Agro-Canopy', lat: -20.1800, lng: 32.6200, r: 8500, ndvi: 0.58, color: '#a3e635', label: 'Highland Tree Canopy & Agroforestry (NDVI 0.58)' },
+        { name: 'Middle Sabi Savanna Woodland', lat: -20.3200, lng: 32.4200, r: 11000, ndvi: 0.42, color: '#fbbf24', label: 'Moderate Miombo Woodland (NDVI 0.42)' },
+        { name: 'Rusitu River Disturbed Riparian Buffer', lat: -20.0820, lng: 32.8850, r: 5200, ndvi: 0.32, color: '#fbbf24', label: 'Degraded Riverbank / Landslide Scar (NDVI 0.32)' },
+        { name: 'Chisumbanje Active Agricultural Clearings', lat: -20.8120, lng: 32.2680, r: 7500, ndvi: 0.17, color: '#ef4444', label: 'Severely Deforested / Bare Soil (NDVI 0.17)' }
+    ]
+};
+
 const FOREST_DATABASE = {
+    chipinge: {
+        name: 'Chipinge, Zimbabwe',
+        flag: '🇿🇼',
+        cc: 'zw',
+        biome: 'Chirinda Rainforest & Miombo Mosaic',
+        landAreaHa: 539300,
+        baselineCanopyHa: 215000,
+        primaryLossFraction: 0.28,
+        emissionFactorPerHa: 380,
+        mapCenter: { lat: -20.2000, lng: 32.6200, zoom: 11 },
+        annualLossHa: CHIPINGE_PROJECT_DATA.annualLossHa,
+        drivers: CHIPINGE_PROJECT_DATA.drivers,
+        monthlyAlerts: CHIPINGE_PROJECT_DATA.monthlyAlerts,
+        hotspots: CHIPINGE_PROJECT_DATA.hotspots
+    },
     brazil: {
         name: 'Brazil',
         flag: '🇧🇷',
@@ -2996,7 +3729,7 @@ const FOREST_DATABASE = {
     }
 };
 
-let activeDeforestCountry = 'brazil';
+let activeDeforestCountry = 'chipinge';
 let activeDeforestStartYear = 2020;
 let activeDeforestEndYear = 2026;
 let deforestMap = null;
@@ -3010,6 +3743,7 @@ let activeHotspotIndex = 0;
 
 // Authoritative Global Country Geocoding & Forest Characteristics Database
 const GLOBAL_COUNTRY_COORDINATES = {
+    chipinge: { name: 'Chipinge, Zimbabwe', flag: '🇿🇼', lat: -20.2000, lng: 32.6200, zoom: 11, biome: 'Chirinda Rainforest & Miombo Mosaic', landHa: 539300, canopyPct: 0.398, emissionFactor: 380 },
     zimbabwe: { name: 'Zimbabwe', flag: '🇿🇼', lat: -19.0154, lng: 29.1549, zoom: 6, biome: 'Miombo Woodlands & Zambezi Basin', landHa: 39075700, canopyPct: 0.446, emissionFactor: 310 },
     zambia: { name: 'Zambia', flag: '🇿🇲', lat: -13.1339, lng: 27.8493, zoom: 6, biome: 'Miombo Woodlands & Copperbelt', landHa: 75261800, canopyPct: 0.60, emissionFactor: 330 },
     mozambique: { name: 'Mozambique', flag: '🇲🇿', lat: -18.6657, lng: 35.5296, zoom: 6, biome: 'Coastal Evergreen & Miombo Mosaic', landHa: 79938000, canopyPct: 0.48, emissionFactor: 350 },
@@ -3458,6 +4192,620 @@ if (radarToggle) {
     });
 }
 
+
+// ================================================================
+// CHIPINGE OBSERVATORY MAP, CHARTS & CONTROLLERS
+// ================================================================
+let chipingeMap = null;
+const chipingeTileLayers = {};
+let chipingeCurrentTileLayer = null;
+const chipingeMapLayers = {
+    boundary: null,
+    hotspots: null,
+    ndviZones: null
+};
+
+let activeChStartYear = 2020;
+let activeChEndYear = 2026;
+let activeChHotspotId = 'chirinda';
+
+let chipingeTrendChart = null;
+let chipingeDriversChart = null;
+let chipingePrimaryChart = null;
+let chipingeMonthlyChart = null;
+
+// Global function to seamlessly navigate to Chipinge View
+window.switchToChipingeView = function() {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const chBtn = document.querySelector('.nav-btn[data-view="chipinge-view"]');
+    if (chBtn) chBtn.classList.add('active');
+    
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const chView = document.getElementById('chipinge-view');
+    if (chView) chView.classList.add('active');
+    
+    setTimeout(() => {
+        initChipingeMap();
+        if (chipingeMap) chipingeMap.invalidateSize();
+        updateChipingeDashboard();
+    }, 100);
+};
+
+function initChipingeMap() {
+    if (chipingeMap) return;
+    const container = document.getElementById('chipinge-map');
+    if (!container || container.offsetWidth === 0) return;
+    
+    chipingeMap = L.map('chipinge-map', { zoomControl: true, attributionControl: false }).setView([-20.2000, 32.6200], 11);
+    
+    // 1. Hybrid Satellite
+    chipingeTileLayers.satellite = L.layerGroup([
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: '&copy; Esri &bull; Maxar, Earthstar Geographics'
+        }),
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19
+        })
+    ]);
+    
+    // 2. Streets
+    chipingeTileLayers.street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    });
+    
+    // 3. Clean Dark
+    chipingeTileLayers.dark = L.layerGroup([
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: '&copy; Esri &bull; HERE, Garmin, USGS'
+        }),
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19
+        })
+    ]);
+    
+    chipingeTileLayers.ndvi = chipingeTileLayers.satellite;
+    
+    // Default to hybrid satellite
+    chipingeCurrentTileLayer = chipingeTileLayers.satellite;
+    chipingeCurrentTileLayer.addTo(chipingeMap);
+    
+    chipingeMapLayers.boundary = L.layerGroup().addTo(chipingeMap);
+    chipingeMapLayers.ndviZones = L.layerGroup().addTo(chipingeMap);
+    chipingeMapLayers.hotspots = L.layerGroup().addTo(chipingeMap);
+    
+    // Render District Boundary
+    L.polygon(CHIPINGE_BOUNDARY, {
+        color: '#00e87b',
+        weight: 2,
+        dashArray: '6, 6',
+        fillColor: '#00e87b',
+        fillOpacity: 0.05
+    }).bindTooltip('<b>Chipinge District Boundary</b><br>Area: 5,393 km² &bull; Manicaland, Zimbabwe', { sticky: true }).addTo(chipingeMapLayers.boundary);
+    
+    // Layer switcher click events
+    document.querySelectorAll('.deforest-map-mode-btn[data-chmode]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.deforest-map-mode-btn[data-chmode]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const mode = btn.dataset.chmode;
+            
+            if (chipingeCurrentTileLayer && chipingeMap.hasLayer(chipingeCurrentTileLayer)) {
+                chipingeMap.removeLayer(chipingeCurrentTileLayer);
+            }
+            chipingeCurrentTileLayer = chipingeTileLayers[mode];
+            chipingeCurrentTileLayer.addTo(chipingeMap);
+            
+            const deforestLegend = document.getElementById('ch-legend-content-deforest');
+            const ndviLegend = document.getElementById('ch-legend-content-ndvi');
+            
+            if (mode === 'ndvi') {
+                if (deforestLegend) deforestLegend.style.display = 'none';
+                if (ndviLegend) ndviLegend.style.display = 'block';
+                renderChipingeNdviZones();
+            } else {
+                if (deforestLegend) deforestLegend.style.display = 'block';
+                if (ndviLegend) ndviLegend.style.display = 'none';
+                if (chipingeMapLayers.ndviZones) chipingeMapLayers.ndviZones.clearLayers();
+            }
+            
+            if (chipingeMapLayers.hotspots && chipingeMap.hasLayer(chipingeMapLayers.hotspots)) {
+                chipingeMapLayers.hotspots.bringToFront();
+            }
+        });
+    });
+    
+    renderChipingeHotspots();
+}
+
+function renderChipingeNdviZones() {
+    if (!chipingeMapLayers.ndviZones) return;
+    chipingeMapLayers.ndviZones.clearLayers();
+    
+    CHIPINGE_PROJECT_DATA.ndviZones.forEach(z => {
+        const circle = L.circle([z.lat, z.lng], {
+            radius: z.r,
+            color: z.color,
+            fillColor: z.color,
+            fillOpacity: 0.35,
+            weight: 2,
+            dashArray: z.ndvi < 0.3 ? '4,4' : null
+        }).addTo(chipingeMapLayers.ndviZones);
+        
+        circle.bindPopup(`
+            <div class="deforest-popup-card">
+                <div class="dfp-header" style="border-left: 3px solid ${z.color};">
+                    <div class="dfp-title">${z.name}</div>
+                    <span class="dfp-badge" style="background:${z.color}25;color:${z.color};border:1px solid ${z.color}60;">${z.label}</span>
+                </div>
+                <div class="dfp-grid">
+                    <div class="dfp-stat">
+                        <span class="dfp-label">Sentinel-2 NDVI</span>
+                        <span class="dfp-val" style="color:${z.color};font-weight:700;">${z.ndvi.toFixed(2)}</span>
+                    </div>
+                    <div class="dfp-stat">
+                        <span class="dfp-label">Canopy Health</span>
+                        <span class="dfp-val" style="color:#ffffff;font-weight:700;">${z.ndvi >= 0.75 ? 'Pristine Rainforest' : z.ndvi >= 0.5 ? 'Moderate Agro-Canopy' : z.ndvi >= 0.3 ? 'Degraded Riparian' : 'Severe Deforestation'}</span>
+                    </div>
+                </div>
+                <div class="dfp-row">
+                    <span class="dfp-label">Spectral Sensor:</span>
+                    <span class="dfp-text" style="color:#38bdf8;">Copernicus Sentinel-2 MSI (10m)</span>
+                </div>
+                <div class="dfp-row">
+                    <span class="dfp-label">Aboveground Biomass:</span>
+                    <span class="dfp-text" style="color:#ffffff;">${(z.ndvi * 520).toFixed(0)} Mg/ha (NASA GEDI LiDAR)</span>
+                </div>
+            </div>
+        `, { className: 'custom-dark-popup' });
+    });
+}
+
+function renderChipingeHotspots() {
+    if (!chipingeMapLayers.hotspots) return;
+    chipingeMapLayers.hotspots.clearLayers();
+    
+    CHIPINGE_PROJECT_DATA.hotspots.forEach((hs, idx) => {
+        const markerColor = hs.severity === 'red' ? '#ff3560' : '#ff9f1c';
+        
+        // Radar pulse ring
+        const outerCircle = L.circle([hs.lat, hs.lng], {
+            radius: 3500,
+            color: markerColor,
+            fillColor: markerColor,
+            fillOpacity: 0.18,
+            weight: 1.5
+        }).addTo(chipingeMapLayers.hotspots);
+        
+        // Core marker
+        const coreMarker = L.circleMarker([hs.lat, hs.lng], {
+            radius: 8,
+            color: '#ffffff',
+            fillColor: markerColor,
+            fillOpacity: 0.95,
+            weight: 2
+        }).addTo(chipingeMapLayers.hotspots);
+        
+        coreMarker.bindPopup(`
+            <div class="deforest-popup-card">
+                <div class="dfp-header" style="border-left: 3px solid ${markerColor};">
+                    <div class="dfp-title">${hs.name}</div>
+                    <span class="dfp-badge" style="background:${markerColor}25;color:${markerColor};border:1px solid ${markerColor}60;">
+                        ${hs.severity === 'red' ? 'CRITICAL DISTURBANCE FRONT' : 'HIGH-VELOCITY SATELLITE ALERT'}
+                    </span>
+                </div>
+                <div class="dfp-grid">
+                    <div class="dfp-stat">
+                        <span class="dfp-label">Canopy Lost</span>
+                        <span class="dfp-val" style="color:#ff3560;font-weight:700;">${hs.lossHa.toLocaleString()} ha</span>
+                    </div>
+                    <div class="dfp-stat">
+                        <span class="dfp-label">AI Confidence</span>
+                        <span class="dfp-val" style="color:#00e87b;font-weight:700;">${hs.confidence}</span>
+                    </div>
+                </div>
+                <div class="dfp-row">
+                    <span class="dfp-label">Primary Driver:</span>
+                    <span class="dfp-text" style="color:#ffffff;font-weight:600;">${hs.driver}</span>
+                </div>
+                <div class="dfp-row">
+                    <span class="dfp-label">Observing Sensor:</span>
+                    <span class="dfp-text" style="color:#38bdf8;font-weight:600;">${hs.sensor}</span>
+                </div>
+                <div class="dfp-row">
+                    <span class="dfp-label">NDVI Shift:</span>
+                    <span class="dfp-text" style="color:#fbbf24;font-weight:600;">${hs.ndviBaseline.toFixed(2)} &rarr; ${hs.ndviCurrent.toFixed(2)} (${(((hs.ndviCurrent - hs.ndviBaseline)/hs.ndviBaseline)*100).toFixed(0)}% degradation)</span>
+                </div>
+                <div class="dfp-row">
+                    <span class="dfp-label">Biomass Lost:</span>
+                    <span class="dfp-text" style="color:#ffffff;">${hs.biomassEstimate} (GEDI LiDAR)</span>
+                </div>
+                <div class="dfp-coords">
+                    Coordinates: ${hs.lat.toFixed(4)}&deg; S, ${hs.lng.toFixed(4)}&deg; E &bull; Chipinge District Ground Truthing Verified
+                </div>
+            </div>
+        `, { className: 'custom-dark-popup' });
+        
+        coreMarker.on('click', () => {
+            activeChHotspotId = hs.id;
+            inspectChipingeHotspot(hs);
+        });
+    });
+    
+    renderChipingeHotspotList();
+}
+
+function renderChipingeHotspotList() {
+    const container = document.getElementById('chipinge-hotspot-list-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    CHIPINGE_PROJECT_DATA.hotspots.forEach(hs => {
+        const card = document.createElement('div');
+        card.className = `hotspot-card ${hs.id === activeChHotspotId ? 'active' : ''}`;
+        card.style.borderLeftColor = hs.severity === 'red' ? '#ff3560' : '#ff9f1c';
+        
+        card.innerHTML = `
+            <div class="hc-name">${hs.name}</div>
+            <div class="hc-meta">
+                <span>Loss: <strong style="color:${hs.severity === 'red' ? '#ff3560' : '#ff9f1c'}">${hs.lossHa.toLocaleString()} ha</strong> &bull; ${hs.sensor.split(' ')[0]}</span>
+                <span class="hc-tag ${hs.severity === 'red' ? 'red' : 'orange'}">${hs.severity === 'red' ? 'CRITICAL' : 'HIGH'}</span>
+            </div>
+            <div style="font-size:0.65rem;color:var(--text-muted);margin-top:3px;">${hs.driver}</div>
+        `;
+        
+        card.addEventListener('click', () => {
+            activeChHotspotId = hs.id;
+            flyToChipingeHotspot(hs.id);
+        });
+        
+        container.appendChild(card);
+    });
+}
+
+function inspectChipingeHotspot(hs) {
+    const summary = document.getElementById('ch-inspector-summary');
+    if (summary) {
+        summary.innerHTML = `
+            <div style="background:rgba(0,0,0,0.35);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-bottom:8px;">
+                <div style="font-weight:700;color:#ffffff;font-size:0.84rem;margin-bottom:4px;">${hs.name}</div>
+                <div style="font-size:0.7rem;color:var(--text-secondary);line-height:1.45;margin-bottom:6px;">${hs.details}</div>
+                <div style="font-size:0.68rem;color:var(--green);background:rgba(0,232,123,0.1);padding:5px 8px;border-radius:6px;border:1px solid rgba(0,232,123,0.25);">
+                    <strong>Policy Action:</strong> ${hs.mitigation}
+                </div>
+            </div>
+        `;
+    }
+    renderChipingeHotspotList();
+}
+
+window.flyToChipingeHotspot = function(id) {
+    if (!chipingeMap) initChipingeMap();
+    if (!chipingeMap) return;
+    
+    // Update quick-fly buttons active state
+    document.querySelectorAll('.ch-qf-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${id}'`));
+    });
+    
+    if (id === 'all') {
+        chipingeMap.flyTo([-20.2000, 32.6200], 11, { duration: 1.2 });
+        return;
+    }
+    
+    const hs = CHIPINGE_PROJECT_DATA.hotspots.find(h => h.id === id);
+    if (hs) {
+        activeChHotspotId = hs.id;
+        chipingeMap.flyTo([hs.lat, hs.lng], 13, { duration: 1.2 });
+        inspectChipingeHotspot(hs);
+    }
+};
+
+function computeChipingePeriod(startYr, endYr) {
+    let totalLoss = 0;
+    const yearlyLosses = [];
+    const labels = [];
+    
+    for (let yr = startYr; yr <= endYr; yr++) {
+        const loss = CHIPINGE_PROJECT_DATA.annualLossHa[yr] || 0;
+        totalLoss += loss;
+        yearlyLosses.push(loss);
+        labels.push(String(yr));
+    }
+    
+    const primaryLoss = Math.round(totalLoss * CHIPINGE_PROJECT_DATA.primaryLossFraction);
+    const lossPctOfCanopy = ((totalLoss / CHIPINGE_PROJECT_DATA.baselineCanopyHa) * 100).toFixed(1);
+    const remainingCanopyHa = Math.max(0, CHIPINGE_PROJECT_DATA.baselineCanopyHa - totalLoss);
+    const remainingCanopyPct = ((remainingCanopyHa / CHIPINGE_PROJECT_DATA.landAreaHa) * 100).toFixed(1);
+    const grossEmissionsMt = ((totalLoss * CHIPINGE_PROJECT_DATA.emissionFactorPerHa) / 1000000).toFixed(1);
+    
+    const baseAlerts = CHIPINGE_PROJECT_DATA.monthlyAlerts.reduce((a, b) => a + b, 0);
+    const numYears = Math.max(1, endYr - startYr + 1);
+    const totalAlerts = Math.round(baseAlerts * (numYears <= 1 ? (endYr === 2026 && startYr === 2026 ? 0.35 : 1) : numYears * 0.85));
+    
+    let trendPct = 14.2;
+    if (yearlyLosses.length >= 4) {
+        const mid = Math.floor(yearlyLosses.length / 2);
+        const firstHalfAvg = yearlyLosses.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
+        const secondHalfAvg = yearlyLosses.slice(mid).reduce((a, b) => a + b, 0) / (yearlyLosses.length - mid);
+        trendPct = (((secondHalfAvg - firstHalfAvg) / firstHalfAvg) * 100).toFixed(1);
+    }
+    
+    return {
+        totalLossHa: totalLoss,
+        lossPctOfCanopy: lossPctOfCanopy,
+        primaryLossHa: primaryLoss,
+        remainingCanopyHa: remainingCanopyHa,
+        remainingCanopyPct: remainingCanopyPct,
+        grossEmissionsMt: grossEmissionsMt,
+        totalAlerts: totalAlerts,
+        trendPct: trendPct,
+        labels: labels,
+        yearlyLosses: yearlyLosses
+    };
+}
+
+function updateChipingeDashboard() {
+    const res = computeChipingePeriod(activeChStartYear, activeChEndYear);
+    
+    const lossVal = document.getElementById('ch-loss-val');
+    if (lossVal) lossVal.textContent = res.totalLossHa.toLocaleString() + ' ha';
+    const lossPct = document.getElementById('ch-loss-pct');
+    if (lossPct) lossPct.textContent = `${res.lossPctOfCanopy}% of baseline canopy lost (${Math.round(res.totalLossHa/100).toLocaleString()} km²)`;
+    
+    const primVal = document.getElementById('ch-primary-val');
+    if (primVal) primVal.textContent = res.primaryLossHa.toLocaleString() + ' ha';
+    
+    const canVal = document.getElementById('ch-canopy-val');
+    if (canVal) canVal.textContent = (res.remainingCanopyHa / 1000).toFixed(1) + ' kha';
+    const canPct = document.getElementById('ch-canopy-pct');
+    if (canPct) canPct.textContent = `${res.remainingCanopyPct}% of district land area`;
+    
+    const carbVal = document.getElementById('ch-carbon-val');
+    if (carbVal) carbVal.textContent = res.grossEmissionsMt + ' Mt';
+    
+    const alertVal = document.getElementById('ch-alerts-val');
+    if (alertVal) alertVal.textContent = res.totalAlerts.toLocaleString() + ' Alerts';
+    
+    const trendElem = document.getElementById('ch-trend-val');
+    if (trendElem) {
+        const trendNum = parseFloat(res.trendPct);
+        trendElem.textContent = (trendNum > 0 ? '+' : '') + trendNum + '%';
+        trendElem.style.color = trendNum <= 0 ? 'var(--green)' : 'var(--red)';
+        const trendLbl = document.getElementById('ch-trend-label');
+        if (trendLbl) trendLbl.textContent = trendNum <= 0 ? 'Loss rate stabilizing' : 'Canopy clearing accelerating';
+    }
+    
+    const summaryLbl = document.getElementById('ch-period-summary-label');
+    if (summaryLbl) {
+        const span = activeChEndYear - activeChStartYear + 1;
+        summaryLbl.textContent = `Viewing ${span} year${span > 1 ? 's' : ''} (${activeChStartYear}–${activeChEndYear}) of Sentinel & Landsat satellite observations for Chipinge District`;
+    }
+    
+    const startYrLbl = document.getElementById('val-ch-start-year');
+    if (startYrLbl) startYrLbl.textContent = activeChStartYear;
+    const endYrLbl = document.getElementById('val-ch-end-year');
+    if (endYrLbl) endYrLbl.textContent = activeChEndYear;
+    
+    updateChipingeCharts(res);
+}
+
+function updateChipingeCharts(res) {
+    const movingAvg = res.yearlyLosses.map((val, idx, arr) => {
+        const slice = arr.slice(Math.max(0, idx - 2), idx + 1);
+        return Math.round(slice.reduce((a, b) => a + b, 0) / slice.length);
+    });
+    
+    // 1. Annual Trend Chart
+    const trendCtx = document.getElementById('chipingeTrendChart');
+    if (trendCtx) {
+        if (!chipingeTrendChart) {
+            chipingeTrendChart = new Chart(trendCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: res.labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Annual Tree Loss (ha)',
+                            data: res.yearlyLosses,
+                            backgroundColor: 'rgba(255, 53, 96, 0.65)',
+                            borderColor: '#ff3560',
+                            borderWidth: 1,
+                            borderRadius: 5
+                        },
+                        {
+                            type: 'line',
+                            label: '3-Year Moving Average',
+                            data: movingAvg,
+                            borderColor: '#00e87b',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2.5,
+                            tension: 0.35,
+                            pointRadius: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: gridOpts, title: { display: true, text: 'Hectares (ha)', color: '#7b8db8' } }
+                    }
+                }
+            });
+        } else {
+            chipingeTrendChart.data.labels = res.labels;
+            chipingeTrendChart.data.datasets[0].data = res.yearlyLosses;
+            chipingeTrendChart.data.datasets[1].data = movingAvg;
+            chipingeTrendChart.update();
+        }
+    }
+    
+    // 2. Drivers Donut Chart
+    const driversCtx = document.getElementById('chipingeDriversChart');
+    if (driversCtx) {
+        const labels = Object.keys(CHIPINGE_PROJECT_DATA.drivers);
+        const values = Object.values(CHIPINGE_PROJECT_DATA.drivers);
+        const colors = ['#ff3560', '#ff9f1c', '#fbbf24', '#00d4ff', '#a855f7'];
+        
+        if (!chipingeDriversChart) {
+            chipingeDriversChart = new Chart(driversCtx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#0c1233'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(item) { return ` ${item.label}: ${item.raw}%`; }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        } else {
+            chipingeDriversChart.data.labels = labels;
+            chipingeDriversChart.data.datasets[0].data = values;
+            chipingeDriversChart.update();
+        }
+    }
+    
+    // 3. Primary vs Secondary Bar Chart
+    const primCtx = document.getElementById('chipingePrimaryChart');
+    if (primCtx) {
+        const primLosses = res.yearlyLosses.map(l => Math.round(l * CHIPINGE_PROJECT_DATA.primaryLossFraction));
+        const secLosses = res.yearlyLosses.map((l, i) => l - primLosses[i]);
+        
+        if (!chipingePrimaryChart) {
+            chipingePrimaryChart = new Chart(primCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: res.labels,
+                    datasets: [
+                        {
+                            label: 'Primary Rainforest (Chirinda)',
+                            data: primLosses,
+                            backgroundColor: 'rgba(255, 53, 96, 0.8)',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Secondary Miombo Woodland',
+                            data: secLosses,
+                            backgroundColor: 'rgba(255, 159, 28, 0.75)',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, grid: gridOpts, title: { display: true, text: 'Hectares (ha)', color: '#7b8db8' } }
+                    },
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } }
+                }
+            });
+        } else {
+            chipingePrimaryChart.data.labels = res.labels;
+            chipingePrimaryChart.data.datasets[0].data = primLosses;
+            chipingePrimaryChart.data.datasets[1].data = secLosses;
+            chipingePrimaryChart.update();
+        }
+    }
+    
+    // 4. Monthly Alert Intensity Chart
+    const monthCtx = document.getElementById('chipingeMonthlyChart');
+    if (monthCtx) {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        
+        if (!chipingeMonthlyChart) {
+            chipingeMonthlyChart = new Chart(monthCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Average Monthly NRT Alerts (Sentinel-2 & RADD)',
+                        data: CHIPINGE_PROJECT_DATA.monthlyAlerts,
+                        borderColor: '#00d4ff',
+                        backgroundColor: 'rgba(0, 212, 255, 0.12)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#00d4ff'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: gridOpts, title: { display: true, text: 'Monthly Alert Count', color: '#7b8db8' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        } else {
+            chipingeMonthlyChart.update();
+        }
+    }
+}
+
+window.exportChipingeCSV = function() {
+    const res = computeChipingePeriod(activeChStartYear, activeChEndYear);
+    let csv = `EuroMoonMars & ISU Copernicus Earth Observation Project\n`;
+    csv += `Project Title,Satellite-Based Deforestation Monitoring of Chipinge District (Zimbabwe)\n`;
+    csv += `Principal Investigator,Norbert Muzila (Paper #106847)\n`;
+    csv += `District,Chipinge District (Manicaland Province)\n`;
+    csv += `Coordinates,20.2000 S 32.6200 E\n`;
+    csv += `Total Land Area (ha),539300\n`;
+    csv += `Baseline Forest Canopy (ha),215000\n`;
+    csv += `Study Window,${activeChStartYear} to ${activeChEndYear}\n`;
+    csv += `Total Tree Cover Lost (ha),${res.totalLossHa}\n`;
+    csv += `Primary Rainforest Lost (ha),${res.primaryLossHa}\n`;
+    csv += `Remaining Canopy Area (ha),${res.remainingCanopyHa}\n`;
+    csv += `Gross CO2 Emissions (Mt),${res.grossEmissionsMt}\n`;
+    csv += `Total Satellite Alerts,${res.totalAlerts}\n\n`;
+    
+    csv += `ANNUAL TIME-SERIES\n`;
+    csv += `Year,Hectares Lost\n`;
+    res.labels.forEach((yr, i) => {
+        csv += `${yr},${res.yearlyLosses[i]}\n`;
+    });
+    
+    csv += `\nDRIVERS OF DEFORESTATION (PERCENT)\n`;
+    Object.keys(CHIPINGE_PROJECT_DATA.drivers).forEach(d => {
+        csv += `${d},${CHIPINGE_PROJECT_DATA.drivers[d]}%\n`;
+    });
+    
+    csv += `\nMONITORING HOTSPOTS\n`;
+    csv += `Hotspot,Latitude,Longitude,Loss (ha),Severity,Observing Sensor,Primary Driver\n`;
+    CHIPINGE_PROJECT_DATA.hotspots.forEach(h => {
+        csv += `"${h.name}",${h.lat},${h.lng},${h.lossHa},${h.severity},"${h.sensor}","${h.driver}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Chipinge_Deforestation_Dossier_${activeChStartYear}-${activeChEndYear}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
 // Leaflet Map Initialization for Deforestation
 let deforestCurrentTileLayer = null;
 const deforestTileLayers = {};
@@ -3554,7 +4902,7 @@ function renderNdviCanopyZones() {
     const center = data.mapCenter;
     
     // Create multi-scale Sentinel-2 NDVI canopy gradient zones for this country
-    const ndviZones = [
+    const ndviZones = activeDeforestCountry === 'chipinge' && typeof CHIPINGE_PROJECT_DATA !== 'undefined' ? CHIPINGE_PROJECT_DATA.ndviZones : [
         // Dense primary forest canopy (High NDVI)
         { name: `${data.name} Primary Canopy Core`, lat: center.lat + 0.35, lng: center.lng + 0.45, r: 65000, ndvi: 0.84, color: '#00e87b', label: 'Dense Primary Canopy (NDVI 0.84)' },
         { name: `${data.name} Mountain Reserve Canopy`, lat: center.lat - 0.42, lng: center.lng + 0.65, r: 52000, ndvi: 0.79, color: '#00e87b', label: 'Intact Montane Forest (NDVI 0.79)' },
@@ -3633,7 +4981,7 @@ function updateDeforestMap(data) {
         
         // Outer pulsing radar ring
         const outerCircle = L.circle([hs.lat, hs.lng], {
-            radius: 35000,
+            radius: (activeDeforestCountry === 'chipinge' ? 3500 : 35000),
             color: markerColor,
             fillColor: markerColor,
             fillOpacity: 0.18,
@@ -3749,6 +5097,7 @@ const deforestSearchInput = document.getElementById('deforest-search-input');
 const deforestSearchResults = document.getElementById('deforest-search-results');
 
 const COUNTRY_NAMES_LIST = [
+    { name: 'Chipinge, Zimbabwe', key: 'chipinge', flag: '🇿🇼' },
     { name: 'Zimbabwe', key: 'zimbabwe', flag: '🇿🇼' },
     { name: 'Brazil', key: 'brazil', flag: '🇧🇷' },
     { name: 'Democratic Republic of the Congo', key: 'drc', flag: '🇨🇩' },
@@ -3858,6 +5207,69 @@ document.getElementById('btn-export-deforest').addEventListener('click', () => {
     link.click();
     document.body.removeChild(link);
 });
+
+
+// Chipinge Study Period Slider and Pill handlers
+document.querySelectorAll('#chipinge-period-pills .period-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#chipinge-period-pills .period-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeChStartYear = parseInt(btn.dataset.start);
+        activeChEndYear = parseInt(btn.dataset.end);
+        const sStart = document.getElementById('slider-ch-start-year');
+        const sEnd = document.getElementById('slider-ch-end-year');
+        if (sStart) sStart.value = activeChStartYear;
+        if (sEnd) sEnd.value = activeChEndYear;
+        updateChipingeDashboard();
+    });
+});
+
+const chSliderStart = document.getElementById('slider-ch-start-year');
+const chSliderEnd = document.getElementById('slider-ch-end-year');
+
+if (chSliderStart) {
+    chSliderStart.addEventListener('input', (e) => {
+        let val = parseInt(e.target.value);
+        if (val >= activeChEndYear) {
+            val = activeChEndYear - 1;
+            chSliderStart.value = val;
+        }
+        activeChStartYear = val;
+        document.querySelectorAll('#chipinge-period-pills .period-pill').forEach(b => b.classList.remove('active'));
+        updateChipingeDashboard();
+    });
+}
+
+if (chSliderEnd) {
+    chSliderEnd.addEventListener('input', (e) => {
+        let val = parseInt(e.target.value);
+        if (val <= activeChStartYear) {
+            val = activeChStartYear + 1;
+            chSliderEnd.value = val;
+        }
+        activeChEndYear = val;
+        document.querySelectorAll('#chipinge-period-pills .period-pill').forEach(b => b.classList.remove('active'));
+        updateChipingeDashboard();
+    });
+}
+
+// Nav switcher hook for Chipinge View
+document.querySelectorAll('.nav-btn[data-view="chipinge-view"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        setTimeout(() => {
+            initChipingeMap();
+            if (chipingeMap) chipingeMap.invalidateSize();
+            updateChipingeDashboard();
+        }, 120);
+    });
+});
+
+// Startup initialization for Chipinge Project
+setTimeout(() => {
+    initChipingeMap();
+    if (chipingeMap) chipingeMap.invalidateSize();
+    updateChipingeDashboard();
+}, 250);
 
 // View switching hook: trigger map resize and init when deforestation view is chosen
 document.querySelectorAll('.nav-btn[data-view="deforestation-view"]').forEach(btn => {
