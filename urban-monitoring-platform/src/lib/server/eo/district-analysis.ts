@@ -18,8 +18,8 @@ import { sitesInDistrict, type District, type MiningSite } from "./zimbabwe";
  * cadastre it cannot determine whether any activity is licensed.
  */
 
-const OPTICAL_WINDOW_DAYS = 45;
-const RADAR_WINDOW_DAYS = 30;
+export const OPTICAL_WINDOW_DAYS = 45;
+export const RADAR_WINDOW_DAYS = 30;
 const OPTICAL_MAX_CLOUD = 15;
 const MAX_TILES = 8;
 
@@ -125,7 +125,7 @@ function bestPass(scenes: Scene[], bbox: [number, number, number, number]) {
 }
 
 /** Runs zonal statistics for every scene of a pass and merges them pixel-weighted. */
-async function passStatistics(collection: string, pass: { scenes: Scene[] }, geometry: District["geometry"], expressions: string[]) {
+async function passStatistics(collection: string, pass: { scenes: Scene[] }, geometry: Area["geometry"], expressions: string[]) {
   const results = await Promise.all(pass.scenes.map((s) => itemStatistics(collection, s.id, geometry, expressions, 768).catch(() => null)));
   const sums = expressions.map(() => 0);
   let pixels = 0;
@@ -140,7 +140,10 @@ async function passStatistics(collection: string, pass: { scenes: Scene[] }, geo
 
 const sceneRefs = (scenes: Scene[]): SceneRef[] => scenes.map((s) => ({ id: s.id, platform: s.platform, cloudCover: s.cloudCover }));
 
-async function opticalAcquisition(d: District, start: string, end: string): Promise<Acquisition<OpticalValues> | null> {
+/** An area to analyse: any polygon with its bounding box (district, site buffer…). */
+export type Area = Pick<District, "geometry" | "bbox">;
+
+export async function opticalAcquisition(d: Area, start: string, end: string): Promise<Acquisition<OpticalValues> | null> {
   const scenes = await searchScenes({ collection: "sentinel-2-l2a", intersects: d.geometry, start, end, maxCloud: OPTICAL_MAX_CLOUD, limit: 80 });
   const pass = bestPass(scenes, d.bbox);
   if (!pass) return null;
@@ -150,7 +153,7 @@ async function opticalAcquisition(d: District, start: string, end: string): Prom
   return { date: pass.date, scenes: sceneRefs(pass.scenes), pixels: stats.pixels, coverage: round(pass.coverage, 2), values: { ndvi, bsi, ndmi, ndbi } };
 }
 
-async function radarAcquisition(d: District, start: string, end: string): Promise<Acquisition<RadarValues> | null> {
+export async function radarAcquisition(d: Area, start: string, end: string): Promise<Acquisition<RadarValues> | null> {
   const scenes = await searchScenes({ collection: "sentinel-1-rtc", intersects: d.geometry, start, end, limit: 60 });
   const pass = bestPass(scenes, d.bbox);
   if (!pass) return null;

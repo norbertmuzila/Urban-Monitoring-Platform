@@ -16,6 +16,7 @@ Lucide icons · Chart.js · Leaflet · SWR · Zod — deployed on Vercel. No API
 | `/dashboard` | **City monitor** — pick any country → state/province → city/town; live conditions, 72 h prediction with verified accuracy, satellite view, largest cities in the country, World Bank context |
 | `/explorer`  | Satellite explorer — 15 live layers (Sentinel-1/2, Landsat 8/9, ALOS-2, Copernicus DEM, ESA WorldCover, VIIRS) with before/after swipe |
 | `/forests`   | Forests & fires for every country — forest area 1990–latest, change since 2000 ranking, NASA VIIRS fires (24 h) |
+| `/chipinge`  | **Chipinge Deforestation Observatory** (featured project) — 7 monitoring sites with live year-on-year Sentinel-2/Sentinel-1 change, 10 m land cover 2017–2023, district screening, VIIRS fires, Angström fire weather and 72 h predictions for Chipinge town |
 | `/zimbabwe`  | Zimbabwe land & mining watch — 91 districts, VIIRS fires, OSM mine sites, per-district satellite screening      |
 | `/sources`   | Data sources, licences, live service health and latest satellite acquisitions                                   |
 
@@ -76,6 +77,7 @@ Open-Meteo · Planetary Computer · NASA FIRMS · World Bank · RainViewer · bu
 | `GET /api/forest/ranking`                             | Forest change since 2000, all countries                   |
 | `GET /api/eo/{layers,tiles,scenes,status}`            | Satellite layer catalogue, tiles, scenes, latest passes   |
 | `GET /api/zw/{overview,districts,fires,sites}` · `/api/zw/districts/:id/analysis` | Zimbabwe watch |
+| `GET /api/chipinge` · `/api/chipinge/land-cover` · `/api/chipinge/sites/:id` · `/api/chipinge/export` | Chipinge observatory: outline, sites & fires; land cover; per-site change; CSV |
 | `GET /api/stats` · `/api/health` · `/api/radar`       | Headline figures, provider health, rain radar             |
 
 Invalid input → `400` with field errors; unknown resources → `404`; upstream outages → `502`.
