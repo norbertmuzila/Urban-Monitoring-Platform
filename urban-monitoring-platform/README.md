@@ -1,4 +1,4 @@
-# Urban Monitoring Platform · v2.2
+# Urban Monitoring Platform · v2.3
 
 Live environmental intelligence for every city on Earth — air quality, weather, satellite imagery,
 forests and fires — with predictions you can verify. Built for the EuroMoonMars programme as the
@@ -12,15 +12,16 @@ Lucide icons · Chart.js · Leaflet · SWR · Zod — deployed on Vercel. No API
 
 | Route        | What it does                                                                                                    |
 | ------------ | --------------------------------------------------------------------------------------------------------------- |
-| `/`          | Overview of the whole platform: live counters, quick location picker, module guide, how it works                |
+| `/`          | Overview of the whole platform: live counters, quick location picker, module guide, live satellites and fires   |
 | `/dashboard` | **City monitor** — pick any country → state/province → city/town; live conditions, 72 h prediction with verified accuracy, satellite view, largest cities in the country, World Bank context |
 | `/explorer`  | Satellite explorer — 15 live layers (Sentinel-1/2, Landsat 8/9, ALOS-2, Copernicus DEM, ESA WorldCover, VIIRS) with before/after swipe |
 | `/forests`   | Forests & fires for every country — forest area 1990–latest, change since 2000 ranking, NASA VIIRS fires (24 h) |
 | `/zimbabwe`  | Zimbabwe land & mining watch — 91 districts, VIIRS fires, OSM mine sites, per-district satellite screening      |
 | `/sources`   | Data sources, licences, live service health and latest satellite acquisitions                                   |
 
-Every view is shareable: `/dashboard?place=186301` (Mombasa), `/forests?country=BR`,
-`/explorer?layer=bsi&lat=-18.93&lng=29.82&z=11`. Old v2.0 routes (`/map`, `/model`, `/pipeline`,
+Addresses stay clean (`/dashboard`, `/forests`, `/explorer`): the selected city is kept in the browser and
+links between pages hand over their country, layer or place without query strings. Older links with
+query strings still open the right view and are then tidied. Old v2.0 routes (`/map`, `/model`, `/pipeline`,
 `/deforestation`) redirect to their replacements.
 
 ## Locations

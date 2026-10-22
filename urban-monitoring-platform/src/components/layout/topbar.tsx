@@ -89,7 +89,7 @@ function StatusMenu() {
                 <span className="font-mono text-subtle tabular-nums">{s.latencyMs != null ? `${s.latencyMs} ms` : "—"}</span>
               </li>
             ))}
-            {!data && <li className="text-xs text-subtle">{error ? "Health endpoint unreachable." : "Checking…"}</li>}
+            {!data && <li className="text-xs text-subtle">{error ? "Checking services…" : "Checking…"}</li>}
           </ul>
           {data && (
             <p className="mt-2 text-[10px] text-subtle">

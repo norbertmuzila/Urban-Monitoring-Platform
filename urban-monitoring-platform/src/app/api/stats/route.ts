@@ -8,9 +8,10 @@ import { COUNTRIES } from "@/lib/server/geo";
 /** GET /api/stats — headline platform figures for the home page. */
 export const GET = handle(async () => {
   await connection(); // depends on live upstreams: never prerender at build time
-  // Don't hold the home page on a cold fire download: 3 s, then it keeps filling the cache.
-  const within = <T,>(p: Promise<T>) => Promise.race([p, new Promise<null>((r) => setTimeout(() => r(null), 3000))]).catch(() => null);
+  // Don't hold the home page on a cold download: answer within 8 s while the caches keep filling.
+  const within = <T,>(p: Promise<T>) => Promise.race([p, new Promise<null>((r) => setTimeout(() => r(null), 8000))]).catch(() => null);
   const [fires, sensors] = await Promise.all([within(getGlobalFires()), within(getSensorStatus())]);
+  const complete = fires != null && (sensors?.sensors.length ?? 0) > 0;
   const fireCountries = fires ? Object.entries(fires.byCountry).sort((a, b) => b[1].length - a[1].length) : [];
   return json(
     {
@@ -30,6 +31,7 @@ export const GET = handle(async () => {
         : null,
       sensors: sensors?.sensors ?? [],
     },
-    { sMaxAge: 1800, staleWhileRevalidate: 7200 },
+    // A partial answer must not be edge-cached: the page polls until it is complete.
+    complete ? { sMaxAge: 1800, staleWhileRevalidate: 7200 } : "no-store",
   );
 });

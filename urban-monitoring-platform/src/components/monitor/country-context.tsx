@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ExternalLink, Flame, Globe2 } from "lucide-react";
 import { useCountryProfile } from "@/lib/client/api";
+import { setIntent } from "@/lib/client/intent";
 import type { IndicatorKey } from "@/lib/server/worldbank";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Flag } from "@/components/ui/flag";
@@ -68,7 +69,7 @@ export function CountryContext({ iso2, name }: { iso2: string; name: string }) {
                     <strong className="font-mono">{data.fires.last24h.toLocaleString("en-GB")}</strong> active fires detected in the last 24 h
                   </span>
                 </span>
-                <Link href={`/forests?country=${iso2}`} className="text-accent hover:underline">
+                <Link href="/forests" onClick={() => setIntent("forests", { iso2 })} className="text-accent hover:underline">
                   Forests & fires →
                 </Link>
               </div>

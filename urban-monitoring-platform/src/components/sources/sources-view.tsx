@@ -15,7 +15,7 @@ export function SourcesView() {
     <>
       <PageHeader
         title="Data sources & status"
-        description="Every figure on this platform comes from an open, citable source. Live services are checked continuously; each page links to the exact request behind its numbers so results can be verified independently."
+        description="Every figure on this platform comes from an open, citable source, with live service checks."
         actions={
           health && (
             <Badge tone={health.status === "operational" ? "ok" : health.status === "degraded" ? "warn" : "danger"} live>

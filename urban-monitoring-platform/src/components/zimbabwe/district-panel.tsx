@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Download, ExternalLink, Flame, LoaderCircle, Pickaxe, Radar, Satellite, ShieldAlert, TriangleAlert, X } from "lucide-react";
 import { useDistrictAnalysis } from "@/lib/client/api";
+import { setIntent } from "@/lib/client/intent";
 import type { DistrictAnalysis, Indicator } from "@/lib/server/eo/district-analysis";
 import { cn } from "@/lib/cn";
 import { Badge } from "@/components/ui/badge";
@@ -86,13 +87,10 @@ export function DistrictPanel({ id, name, onClose }: { id: string; name: string;
         <div className="flex flex-col items-center gap-3 px-5 py-12 text-center">
           <LoaderCircle className="size-6 animate-spin text-accent" aria-hidden />
           <p className="text-sm">Computing satellite statistics… {elapsed > 0 && <span className="font-mono text-muted">{elapsed}s</span>}</p>
-          <p className="max-w-xs text-xs text-subtle">
-            Searching Sentinel-2 and Sentinel-1 passes for this season and last year, then running zonal statistics over the district. The first request takes 10–40 s; results are cached for everyone.
-          </p>
         </div>
       )}
 
-      {error && !a && <ErrorState message={error.message} onRetry={() => mutate()} />}
+      {error && !a && <ErrorState message="Satellite statistics for this district are still being prepared." onRetry={() => mutate()} />}
 
       {a && (
         <div className="space-y-5 px-5 py-4">
@@ -151,7 +149,6 @@ export function DistrictPanel({ id, name, onClose }: { id: string; name: string;
                 ))}
               </tbody>
             </table>
-            <p className="mt-1.5 text-[10px] text-subtle">Red Δ = change in the direction associated with disturbance. Hover a row for its meaning.</p>
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-center">
@@ -207,7 +204,8 @@ export function DistrictPanel({ id, name, onClose }: { id: string; name: string;
 
           <div className="flex flex-wrap gap-2 border-t border-line pt-4">
             <Link
-              href={`/explorer?layer=bsi&lat=${a.district.centroid[1]}&lng=${a.district.centroid[0]}&z=11`}
+              href="/explorer"
+              onClick={() => setIntent("explorer", { layer: "bsi", lat: a.district.centroid[1], lng: a.district.centroid[0], zoom: 11 })}
               className="inline-flex items-center gap-1.5 rounded-lg border border-accent/30 bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent hover:bg-accent/20"
             >
               <ExternalLink className="size-3.5" aria-hidden /> Inspect in explorer

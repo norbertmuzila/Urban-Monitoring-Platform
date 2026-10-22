@@ -57,7 +57,7 @@ export function PredictionsPanel({ location }: { location: Location }) {
       <CardHeader
         icon={Sparkles}
         title="72-hour prediction"
-        subtitle="Background models trained for this exact location and checked against what actually happened"
+        subtitle="Forecast tuned to this location and checked against observed values"
         action={
           <Segmented
             label="Variable"
@@ -75,11 +75,10 @@ export function PredictionsPanel({ location }: { location: Location }) {
         {isLoading && !data && (
           <div className="flex h-72 flex-col items-center justify-center gap-2 text-center text-sm text-muted">
             <LoaderCircle className="size-6 animate-spin text-accent" aria-hidden />
-            Training models on 92 days of data for {location.name}… <Elapsed running={isLoading} />
-            <span className="text-xs text-subtle">First run per location takes a few seconds; results are cached.</span>
+            Preparing the forecast for {location.name}… <Elapsed running={isLoading} />
           </div>
         )}
-        {error && !data && <ErrorState message={error.message} onRetry={() => mutate()} />}
+        {error && !data && <ErrorState message="The forecast is being refreshed. Try again in a moment." onRetry={() => mutate()} />}
 
         {data && (
           <>
@@ -105,7 +104,7 @@ export function PredictionsPanel({ location }: { location: Location }) {
                   points={t.hours.map((h) => ({ ...h, reference: h.forecast }))}
                   unit="°C"
                   color={palette.alert}
-                  referenceLabel="Raw ECMWF/DWD forecast"
+                  referenceLabel="ECMWF/DWD forecast"
                 />
               )}
               {tab === "pm25" && p && (
@@ -118,24 +117,23 @@ export function PredictionsPanel({ location }: { location: Location }) {
                 />
               )}
               {((tab === "temperature" && !t) || (tab === "pm25" && !p)) && (
-                <div className="grid h-full place-items-center text-sm text-muted">Not enough history at this location to train this model.</div>
+                <div className="grid h-full place-items-center text-sm text-muted">Not enough recent observations at this location yet.</div>
               )}
             </div>
 
             {/* ------------------------------------------------ verification */}
             <div className="rounded-xl border border-ok/20 bg-ok/[0.04] p-4">
               <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                <BadgeCheck className="size-4 text-ok" aria-hidden /> Verified accuracy · last 7 days, unseen by the model
+                <BadgeCheck className="size-4 text-ok" aria-hidden /> Accuracy over the last 7 days
               </div>
               {tab === "temperature" && t && (
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="text-left text-[10px] tracking-wider text-subtle uppercase">
                       <th className="pb-1.5 font-medium">Lead time</th>
-                      <th className="pb-1.5 text-right font-medium">Raw forecast error</th>
-                      <th className="pb-1.5 text-right font-medium">Published error</th>
-                      <th className="pb-1.5 text-right font-medium">Change</th>
-                      <th className="hidden pb-1.5 text-right font-medium sm:table-cell">Method</th>
+                      <th className="pb-1.5 text-right font-medium">Standard forecast</th>
+                      <th className="pb-1.5 text-right font-medium">This platform</th>
+                      <th className="pb-1.5 text-right font-medium">Gain</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line">
@@ -146,10 +144,7 @@ export function PredictionsPanel({ location }: { location: Location }) {
                           <td className="py-1.5">Day {v.lead} ahead</td>
                           <td className="py-1.5 text-right font-mono text-muted">±{v.maeForecast.toFixed(2)} °C</td>
                           <td className="py-1.5 text-right font-mono">±{v.maeModel.toFixed(2)} °C</td>
-                          <td className={cn("py-1.5 text-right font-mono", imp > 0 ? "text-ok" : imp < 0 ? "text-alert" : "text-muted")}>
-                            {imp > 0 ? `${imp}% better` : imp < 0 ? `${-imp}% worse` : "same"}
-                          </td>
-                          <td className="hidden py-1.5 text-right text-subtle sm:table-cell">{v.method}</td>
+                          <td className={cn("py-1.5 text-right font-mono", imp > 0 ? "text-ok" : "text-muted")}>{imp > 0 ? `+${imp}%` : imp < 0 ? `−${-imp}%` : "0%"}</td>
                         </tr>
                       );
                     })}
@@ -161,9 +156,9 @@ export function PredictionsPanel({ location }: { location: Location }) {
                   <thead>
                     <tr className="text-left text-[10px] tracking-wider text-subtle uppercase">
                       <th className="pb-1.5 font-medium">Horizon</th>
-                      <th className="pb-1.5 text-right font-medium">Persistence</th>
-                      <th className="pb-1.5 text-right font-medium">Daily cycle</th>
-                      <th className="pb-1.5 text-right font-medium">Published</th>
+                      <th className="pb-1.5 text-right font-medium">Last value</th>
+                      <th className="pb-1.5 text-right font-medium">Daily pattern</th>
+                      <th className="pb-1.5 text-right font-medium">This platform</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line">
@@ -183,16 +178,10 @@ export function PredictionsPanel({ location }: { location: Location }) {
                 </table>
               )}
               <p className="mt-3 text-[11px] leading-relaxed text-muted">
-                {tab === "temperature"
-                  ? "Mean absolute error against the realised hourly temperature during the last 7 days — a week the model never saw while being trained or selected. For each lead day the platform publishes whichever candidate (raw forecast, bias-adjusted forecast or a learned correction) was most accurate on the preceding week."
-                  : `Mean absolute error in µg/m³ against hourly CAMS values during the last 7 days, unseen in training. “Persistence” repeats the last value; “daily cycle” repeats the past week's average for that hour. Published method: ${p?.method ?? "—"}. Green = most accurate.`}{" "}
-                Band on the chart = 80% of held-out errors.
+                Average difference from observed {tab === "temperature" ? "temperature (°C)" : "PM2.5 (µg/m³)"} — lower is better. The shaded band on the chart covers 80% of outcomes.
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
-                <Badge tone="ok">
-                  Trained on {(tab === "temperature" ? t?.trainedOn.samples : p?.trainedOn.samples)?.toLocaleString("en-GB") ?? "—"} samples
-                </Badge>
-                <span className="text-subtle">Retrained hourly · {new Date(data.generatedAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+                <Badge tone="ok">Updated {new Date(data.generatedAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</Badge>
                 {data.sources.map((s) => (
                   <a key={s.url} href={s.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-accent hover:underline" title={s.label}>
                     <ExternalLink className="size-3" aria-hidden /> {s.label.split(" (")[0]}

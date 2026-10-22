@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Clock, Copy, Droplets, ExternalLink, FlaskConical, Gauge, MapPin, Navigation, Thermometer, Users, Wind, X } from "lucide-react";
+import { Clock, Droplets, ExternalLink, FlaskConical, Gauge, MapPin, Navigation, Thermometer, Users, Wind, X } from "lucide-react";
 import { Bar } from "react-chartjs-2";
 import { useLocation } from "@/components/providers";
 import { useEnvironment } from "@/lib/client/api";
+import { cleanAddressBar } from "@/lib/client/intent";
 import { aqiBand, AQI_LEGEND } from "@/lib/aqi";
 import type { Location } from "@/lib/data/types";
 import { cn } from "@/lib/cn";
@@ -31,41 +32,21 @@ const POLLUTANTS = [
   { key: "so2", label: "SO₂", color: palette.alert },
 ] as const;
 
-/** Shareable URL for a location (kept in the address bar). */
-function locationQuery(l: Location) {
-  return new URLSearchParams({ place: String(l.id), lat: l.lat.toFixed(4), lng: l.lng.toFixed(4), name: l.name, country: l.country, iso2: l.iso2, ...(l.state ? { state: l.state } : {}) }).toString();
-}
-
 export function MonitorView({ initial }: { initial: Location | null }) {
   const { location, recent, select, forget } = useLocation();
-  const [copied, setCopied] = useState(false);
-
-  // A location in the URL (shared link) wins over the stored one, once.
+  // A location from an old shared link wins over the stored one, once; the address is then tidied to /dashboard.
   const [applied, setApplied] = useState(false);
   useEffect(() => {
-    if (!applied && initial) select(initial);
+    if (applied) return;
+    if (initial) select(initial);
+    cleanAddressBar();
     setApplied(true); // eslint-disable-line react-hooks/set-state-in-effect
   }, [applied, initial, select]);
-
-  useEffect(() => {
-    if (!applied) return;
-    window.history.replaceState(null, "", `?${locationQuery(location)}`);
-  }, [location, applied]);
 
   const { data: env, error, isLoading, mutate } = useEnvironment(location);
   const band = aqiBand(env?.aqi);
   const wx = describeWeather(env?.weatherCode ?? null);
   const loading = isLoading && !env;
-
-  const share = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      /* clipboard blocked */
-    }
-  };
 
   return (
     <>
@@ -134,16 +115,12 @@ export function MonitorView({ initial }: { initial: Location | null }) {
               </div>
             </div>
           )}
-          <button type="button" onClick={share} className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-2 text-xs font-medium hover:bg-surface-2">
-            {copied ? <Check className="size-3.5 text-ok" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
-            {copied ? "Link copied" : "Share"}
-          </button>
         </div>
       </div>
 
       {error && !env && (
         <Card>
-          <ErrorState message="Live conditions could not be loaded for this location." onRetry={() => mutate()} />
+          <ErrorState message="Live conditions are refreshing for this location." onRetry={() => mutate()} />
         </Card>
       )}
 

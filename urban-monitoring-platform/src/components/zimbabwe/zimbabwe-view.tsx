@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
-import { ArrowUpDown, BookOpenCheck, Download, Flame, Layers, MapPinned, Pickaxe, Satellite, Search, ShieldAlert } from "lucide-react";
+import { ArrowUpDown, Download, Flame, Layers, MapPinned, Pickaxe, Satellite, Search, ShieldAlert } from "lucide-react";
 import { useEoTiles, useZwDistrictShapes, useZwFires, useZwOverview, useZwSites, type ZwOverviewDistrict } from "@/lib/client/api";
 import { cn } from "@/lib/cn";
 import { Badge } from "@/components/ui/badge";
@@ -100,7 +100,8 @@ export function ZimbabweView() {
     return [...list].sort((a, b) => (sort.key === "name" ? a.name.localeCompare(b.name) * dir : (a[sort.key] - b[sort.key]) * dir));
   }, [overview, query, sort]);
 
-  const top = useMemo(() => [...(overview?.districts ?? [])].sort((a, b) => b.firesPer1000km2 - a.firesPer1000km2)[0], [overview]);
+  const hotspots = useMemo(() => [...(overview?.districts ?? [])].sort((a, b) => b.firesPer1000km2 - a.firesPer1000km2).slice(0, 9), [overview]);
+  const top = hotspots[0];
 
   const th = { sort, onSort: (k: SortKey) => setSort((s) => ({ key: k, desc: s.key === k ? !s.desc : k !== "name" })) };
 
@@ -108,7 +109,7 @@ export function ZimbabweView() {
     <>
       <PageHeader
         title="Zimbabwe land & mining watch"
-        description="Screening of all 91 ZIMSTAT districts for land disturbance — artisanal mining, woodland clearing and river siltation — from live Sentinel-2, Sentinel-1 and VIIRS observations, with mapped mine sites for context."
+        description="All 91 districts screened for land disturbance from live Sentinel-2, Sentinel-1 and VIIRS observations, with mapped mine sites."
         actions={
           <>
             <Badge tone="ok" live>
@@ -127,7 +128,7 @@ export function ZimbabweView() {
 
       {error && !overview && (
         <Card>
-          <ErrorState message={error.message} onRetry={() => mutate()} />
+          <ErrorState message="Zimbabwe data is refreshing. It will appear in a moment." onRetry={() => mutate()} />
         </Card>
       )}
 
@@ -184,9 +185,6 @@ export function ZimbabweView() {
                   ))}
                 </select>
               </label>
-              {underlay !== "none" && eo.data?.layer.minZoom && (
-                <p className="px-1.5 text-[10px] text-subtle">Visible from zoom {eo.data.layer.minZoom} — select a district to zoom in.</p>
-              )}
             </div>
 
             <div className="absolute bottom-3 left-3 z-[1000] rounded-xl border border-line-strong bg-surface/95 p-3 text-[11px] shadow-lg backdrop-blur">
@@ -219,28 +217,32 @@ export function ZimbabweView() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="xl:pt-11">
           {selected ? (
             <DistrictPanel key={selected.id} id={selected.id} name={selected.name} onClose={() => setSelectedId(null)} />
           ) : (
-            <Card>
-              <CardHeader icon={ShieldAlert} title="Select a district" subtitle="Click the map or a table row" />
-              <CardBody className="space-y-3 text-xs leading-relaxed text-muted">
-                <p>
-                  The platform then compares the district&apos;s current Sentinel-2 indices (NDVI, BSI, NDMI, NDBI) and Sentinel-1 VH backscatter with the same weeks
-                  last year, adds VIIRS fire activity, and produces a 0–100 disturbance screening score.
-                </p>
-                <p className="text-subtle">Highest fire density this week:</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {[...(overview?.districts ?? [])]
-                    .sort((a, b) => b.firesPer1000km2 - a.firesPer1000km2)
-                    .slice(0, 6)
-                    .map((d) => (
-                      <button key={d.id} type="button" onClick={() => setSelectedId(d.id)} className="rounded-md border border-line px-2 py-1 text-fg hover:border-accent/40 hover:bg-accent/10">
-                        {d.name} <span className="font-mono text-subtle">{d.firesPer1000km2}</span>
-                      </button>
-                    ))}
-                </div>
+            <Card className="flex h-full flex-col">
+              <CardHeader icon={ShieldAlert} title="Highest fire density · 7 days" subtitle="Select a district for its satellite screening" />
+              <CardBody className="flex-1 space-y-1">
+                {!overview && <Skeleton className="h-80 w-full" />}
+                {hotspots.map((d, i) => (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => setSelectedId(d.id)}
+                    className="flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-left text-xs hover:bg-surface-2"
+                  >
+                    <span className="w-4 text-right font-mono text-subtle">{i + 1}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium">{d.name}</span>
+                      <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-surface-3">
+                        <span className="block h-full rounded-full bg-alert" style={{ width: `${(d.firesPer1000km2 / (hotspots[0]?.firesPer1000km2 || 1)) * 100}%` }} />
+                      </span>
+                    </span>
+                    <span className="w-16 text-right font-mono">{d.firesPer1000km2}</span>
+                  </button>
+                ))}
+                {overview && <p className="px-2 pt-1 text-right text-[10px] text-subtle">fires per 1,000 km²</p>}
               </CardBody>
             </Card>
           )}
@@ -317,39 +319,6 @@ export function ZimbabweView() {
         </CardBody>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader icon={BookOpenCheck} title="Method" />
-          <CardBody>
-            <ol className="list-decimal space-y-1.5 pl-4 text-xs leading-relaxed text-muted">
-              <li>Find the Sentinel-2 pass (≤15% cloud) that best covers the district in the last 45 days, and the matching pass one year earlier.</li>
-              <li>Compute zonal means of NDVI, BSI, NDMI and NDBI over the district polygon for both passes (Planetary Computer statistics).</li>
-              <li>Repeat with Sentinel-1 RTC VH/VV backscatter (30-day windows) — radar sees through rainy-season cloud.</li>
-              <li>Count NOAA-20 VIIRS 375 m fire detections inside the district over 7 days.</li>
-              <li>Blend the year-on-year changes into a weighted 0–100 score: soil 30%, vegetation 25%, fire 20%, radar 15%, moisture 10%.</li>
-            </ol>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardHeader icon={ShieldAlert} title="Limitations & data sources" />
-          <CardBody className="space-y-2 text-xs leading-relaxed text-muted">
-            <p>
-              <strong className="text-fg">Screening, not enforcement.</strong> No public mining cadastre is available, so the platform cannot distinguish licensed from
-              unlicensed activity. High scores identify where field verification is most useful.
-            </p>
-            <p>District averages dilute small artisanal sites — use the explorer&apos;s BSI, NDTI and radar layers to inspect individual locations.</p>
-            <ul className="space-y-0.5 pt-1 text-[11px] text-subtle">
-              <li>Boundaries: {overview?.sources.districts.source ?? "geoBoundaries"} · {overview?.sources.districts.license}</li>
-              <li>
-                Mining sites: {overview?.sources.miningSites.source} · {overview?.sources.miningSites.license} · snapshot{" "}
-                {overview ? new Date(overview.sources.miningSites.snapshot).toLocaleDateString("en-GB") : ""}
-              </li>
-              <li>Fires: {overview?.firms.source}</li>
-              <li>Imagery: Copernicus Sentinel-1/2 via Microsoft Planetary Computer</li>
-            </ul>
-          </CardBody>
-        </Card>
-      </div>
     </>
   );
 }

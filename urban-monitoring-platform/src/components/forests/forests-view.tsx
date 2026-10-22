@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import useSWR from "swr";
 import { Chart } from "react-chartjs-2";
 import { ChartLine, Download, ExternalLink, Flame, Map as MapIcon, ShieldCheck, TreePine, TrendingDown, TrendingUp, Trophy } from "lucide-react";
@@ -66,12 +66,6 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
   const end = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const eo = useEoTiles(underlay === "none" ? null : underlay, 60, end);
 
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("country", iso2);
-    window.history.replaceState(null, "", url);
-  }, [iso2]);
-
   const ind = profile.data?.indicators.indicators;
   const km2 = ind?.forestKm2.points ?? [];
   const pct = ind?.forestPct.points ?? [];
@@ -98,7 +92,7 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
     <>
       <PageHeader
         title="Forests & fires"
-        description="Forest cover for every country from the World Bank / FAO Forest Resources Assessment, with NASA VIIRS fire detections from the last 24 hours and ESA WorldCover satellite land cover."
+        description="Forest cover for every country (World Bank / FAO), NASA VIIRS fires from the last 24 hours and ESA WorldCover land cover."
         actions={
           <a
             href={`/api/country/${iso2}/export`}
@@ -129,7 +123,7 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
 
       {profile.error && !profile.data && (
         <Card>
-          <ErrorState message={`World Bank statistics for ${name} could not be loaded right now.`} onRetry={() => profile.mutate()} />
+          <ErrorState message={`World Bank statistics for ${name} are refreshing.`} onRetry={() => profile.mutate()} />
         </Card>
       )}
       {profile.data && !km2.length && (
@@ -258,7 +252,7 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
                   <span className="size-2 rounded-full bg-[#fbbf24]" /> fire
                   <span className="size-2 rounded-full bg-[#f43f5e]" /> intense fire (≥20 MW)
                 </div>
-                <div className="mt-1 text-[10px] text-subtle">Land cover renders from zoom 6 — zoom in on small countries.</div>
+                
               </div>
             )}
           </div>

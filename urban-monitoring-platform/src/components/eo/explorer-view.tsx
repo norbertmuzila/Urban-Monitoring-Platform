@@ -98,7 +98,7 @@ export function ExplorerView({ initial }: { initial: ExplorerInitial }) {
     <>
       <PageHeader
         title="Satellite explorer"
-        description="Live, key-free Copernicus, Landsat, JAXA and NASA layers. Pick an index, a place and a time window — mosaics are built on demand from the clearest scenes, and compare mode swipes between two dates to reveal change."
+        description="Live Copernicus, Landsat, JAXA and NASA layers. Pick a layer, a place and a time window; compare mode swipes between two dates."
         actions={
           <Badge tone="ok" live>
             Live STAC catalogue
@@ -221,7 +221,7 @@ export function ExplorerView({ initial }: { initial: ExplorerInitial }) {
               <span className="pointer-events-auto inline-flex items-center gap-2 rounded-lg border border-line-strong bg-surface/95 px-3 py-1.5 text-xs font-medium backdrop-blur">
                 {after.isLoading ? <LoaderCircle className="size-3.5 animate-spin text-accent" aria-hidden /> : <SatelliteDish className="size-3.5 text-accent" aria-hidden />}
                 {layer?.label ?? "…"}
-                {after.error && <span className="text-danger">· unavailable</span>}
+                {after.error && <span className="text-subtle">· refreshing</span>}
               </span>
               <Segmented label="Basemap" size="xs" value={basemap} onChange={setBasemap} options={BASEMAP_OPTIONS} className="pointer-events-auto" />
             </div>
@@ -297,7 +297,7 @@ export function ExplorerView({ initial }: { initial: ExplorerInitial }) {
                 ) : !view || view.zoom < 7 ? (
                   <p className="text-xs text-subtle">Zoom in to list the scenes behind this view.</p>
                 ) : scenes.error ? (
-                  <p className="text-xs text-danger">Scene catalogue unavailable.</p>
+                  <p className="text-xs text-subtle">Scene list is refreshing…</p>
                 ) : scenes.data && scenes.data.scenes.length === 0 ? (
                   <p className="text-xs text-warn">No scenes match this window — widen the window or relax the date.</p>
                 ) : (

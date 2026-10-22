@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ExternalLink, SatelliteDish } from "lucide-react";
 import { useEoTiles } from "@/lib/client/api";
+import { setIntent } from "@/lib/client/intent";
 import type { Location } from "@/lib/data/types";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Segmented } from "@/components/ui/segmented";
@@ -57,7 +58,8 @@ export function CitySatellite({ location }: { location: Location }) {
         <div className="flex items-center justify-between gap-3 text-[11px] text-subtle">
           <span className="truncate">{tiles.data?.layer.detects}</span>
           <Link
-            href={`/explorer?layer=${layer}&lat=${location.lat}&lng=${location.lng}&z=12`}
+            href="/explorer"
+            onClick={() => setIntent("explorer", { layer, lat: location.lat, lng: location.lng, zoom: 12 })}
             className="inline-flex shrink-0 items-center gap-1 text-accent hover:underline"
           >
             Open in explorer <ExternalLink className="size-3" aria-hidden />

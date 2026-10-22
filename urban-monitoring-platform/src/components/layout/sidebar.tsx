@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Satellite } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { isActive, NAV_ITEMS } from "./nav";
 
@@ -46,13 +45,6 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="m-3 rounded-xl border border-line bg-surface-2/60 p-3">
-        <div className="flex items-center gap-2 text-xs font-medium">
-          <Satellite className="size-4 text-accent" strokeWidth={1.75} aria-hidden />
-          Open Earth observation
-        </div>
-        <p className="mt-1.5 text-[11px] leading-relaxed text-subtle">Copernicus, NASA, USGS, JAXA, ECMWF and World Bank data — every figure links to its source.</p>
-      </div>
     </aside>
   );
 }

@@ -31,7 +31,7 @@ export function LiveAcquisitions() {
         }
       />
       <CardBody>
-        {error && !data && <p className="text-xs text-danger">Sensor status unavailable.</p>}
+        {error && !data && <p className="text-xs text-subtle">Sensor status is refreshing…</p>}
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {!data && !error && Array.from({ length: 4 }, (_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
           {data?.sensors.map((s) => {
