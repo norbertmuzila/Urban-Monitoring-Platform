@@ -61,7 +61,7 @@ function useElapsed(running: boolean) {
   return s;
 }
 
-export function DistrictPanel({ id, name, onClose }: { id: string; name: string; onClose?: () => void }) {
+export function DistrictPanel({ id, name, onClose }: { id: string; name: string; onClose: () => void }) {
   const { data: a, error, isLoading, mutate } = useDistrictAnalysis(id);
   const elapsed = useElapsed(isLoading);
 
@@ -77,11 +77,9 @@ export function DistrictPanel({ id, name, onClose }: { id: string; name: string;
             </p>
           )}
         </div>
-        {onClose && (
-          <button type="button" onClick={onClose} aria-label="Close district" className="rounded-md p-1.5 text-subtle hover:bg-surface-2 hover:text-fg">
-            <X className="size-4" aria-hidden />
-          </button>
-        )}
+        <button type="button" onClick={onClose} aria-label="Close district" className="rounded-md p-1.5 text-subtle hover:bg-surface-2 hover:text-fg">
+          <X className="size-4" aria-hidden />
+        </button>
       </header>
 
       {isLoading && !a && (

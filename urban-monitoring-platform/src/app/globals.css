@@ -57,14 +57,12 @@
   }
 }
 
-/* Subtle backdrop grid behind the app shell. */
+/* Clean backdrop behind the app shell: soft colour glows only, no grid. */
 .app-backdrop {
   background-image:
     radial-gradient(60rem 40rem at 10% -10%, rgb(34 211 238 / 0.06), transparent 60%),
-    radial-gradient(50rem 30rem at 110% 10%, rgb(167 139 250 / 0.05), transparent 60%),
-    linear-gradient(rgb(255 255 255 / 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.015) 1px, transparent 1px);
-  background-size: auto, auto, 56px 56px, 56px 56px;
+    radial-gradient(50rem 30rem at 110% 10%, rgb(167 139 250 / 0.05), transparent 60%);
+  background-attachment: fixed;
 }
 
 /* Range input used by the period controller. */

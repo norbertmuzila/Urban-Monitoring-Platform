@@ -10,7 +10,6 @@ import type { ResolvedLayer } from "@/lib/server/eo/layers";
 import type { Scene } from "@/lib/server/eo/planetary";
 import type { SensorStatus } from "@/lib/server/eo/status";
 import type { MiningSite } from "@/lib/server/eo/zimbabwe";
-import type { ChipingeSite, LandCoverYear, SiteAnalysis } from "@/lib/server/eo/chipinge";
 import type { CountryInfo, Place } from "@/lib/server/geo";
 import type { Prediction } from "@/lib/server/model/predict";
 import type { GeocodeResult } from "@/lib/server/open-meteo";
@@ -123,33 +122,6 @@ export const useEoScenes = (layer: string | null, days: number, end: string, bbo
   );
 
 export const useEoStatus = () => useSWR<{ checkedAt: string; sensors: SensorStatus[]; areas: string[] }>("/api/eo/status", fetcher, { refreshInterval: 600_000 });
-
-// ---------------------------------------------------------- Chipinge observatory
-
-export interface ChipingeOverview {
-  town: { id: number; name: string; lat: number; lng: number; population: number };
-  areaKm2: number;
-  bbox: [number, number, number, number];
-  outline: { type: "Feature"; properties: { name: string; source: string }; geometry: PolygonGeometry };
-  sites: ChipingeSite[];
-  fires: { last24h: { lat: number; lng: number; frp: number; acquired: string; night: boolean }[]; last7d: number; night7d: number; latestAcquisition: string | null } | null;
-}
-
-export const useChipinge = () => useSWR<ChipingeOverview>("/api/chipinge", fetcher, { revalidateOnFocus: false, refreshInterval: (d) => (d?.fires ? 900_000 : 15_000) });
-
-export const useChipingeLandCover = () =>
-  useSWR<{ years: LandCoverYear[]; areaKm2: number; source: string; classes: { label: string; color: string }[] }>("/api/chipinge/land-cover", fetcher, { revalidateOnFocus: false });
-
-/** Live analysis of every monitoring site (fetched in parallel; failed sites resolve to null). */
-export const useChipingeSites = (ids: string[] | undefined) =>
-  useSWR<Record<string, SiteAnalysis | null>>(
-    ids?.length ? ["chipinge-sites", ...ids] : null,
-    async () => {
-      const results = await Promise.allSettled(ids!.map((id) => fetcher<SiteAnalysis>(`/api/chipinge/sites/${id}`)));
-      return Object.fromEntries(ids!.map((id, i) => [id, results[i].status === "fulfilled" ? (results[i] as PromiseFulfilledResult<SiteAnalysis>).value : null]));
-    },
-    { revalidateOnFocus: false },
-  );
 
 // ---------------------------------------------------------------- Zimbabwe watch
 

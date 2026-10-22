@@ -1,9 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
-import { ArrowUpDown, BookOpenCheck, Download, Flame, Layers, MapPinned, Pickaxe, Satellite, Search, ShieldAlert, Telescope } from "lucide-react";
+import { ArrowUpDown, BookOpenCheck, Download, Flame, Layers, MapPinned, Pickaxe, Satellite, Search, ShieldAlert } from "lucide-react";
 import { useEoTiles, useZwDistrictShapes, useZwFires, useZwOverview, useZwSites, type ZwOverviewDistrict } from "@/lib/client/api";
 import { cn } from "@/lib/cn";
 import { Badge } from "@/components/ui/badge";
@@ -125,18 +124,6 @@ export function ZimbabweView() {
           </>
         }
       />
-
-      <Link
-        href="/chipinge"
-        className="group flex items-center justify-between gap-3 rounded-[var(--radius-card)] border border-ok/25 bg-ok/[0.06] px-5 py-3 text-sm transition-colors hover:bg-ok/10"
-      >
-        <span className="flex items-center gap-2">
-          <Telescope className="size-4 text-ok" aria-hidden />
-          <strong>Chipinge Deforestation Observatory</strong>
-          <span className="hidden text-muted sm:inline">— site-level monitoring, land-cover change and fire weather for Chipinge District</span>
-        </span>
-        <span className="text-ok transition-transform group-hover:translate-x-0.5">Open →</span>
-      </Link>
 
       {error && !overview && (
         <Card>

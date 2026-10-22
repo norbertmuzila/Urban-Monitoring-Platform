@@ -17,6 +17,5 @@ export const ZIMBABWE_PLACES: Place[] = [
   { id: "mazowe", label: "Mazowe valley", hint: "Alluvial panning", lat: -17.5, lng: 30.97, zoom: 11, iso2: "zw" },
   { id: "penhalonga", label: "Penhalonga · Odzi", hint: "River siltation", lat: -18.89, lng: 32.68, zoom: 11, iso2: "zw" },
   { id: "gokwe", label: "Gokwe", hint: "Woodland clearing", lat: -18.22, lng: 28.93, zoom: 10, iso2: "zw" },
-  { id: "chipinge", label: "Chimanimani · Chipinge", hint: "Cyclone scars", lat: -19.9, lng: 32.8, zoom: 10, iso2: "zw" },
   { id: "hwange", label: "Hwange", hint: "Coal & fire corridor", lat: -18.36, lng: 26.5, zoom: 10, iso2: "zw" },
 ];

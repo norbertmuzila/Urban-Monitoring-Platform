@@ -138,28 +138,6 @@ export interface BandStats {
 }
 
 /**
- * Pixel counts per class value of a categorical raster (e.g. a land-cover map) inside a
- * polygon, for one item. Returns { classValue: pixelCount }.
- */
-export async function itemClassHistogram(collection: string, itemId: string, geometry: Geometry, asset: string, maxSize = 2048): Promise<Record<number, number>> {
-  "use cache";
-  cacheLife("max"); // a published land-cover map never changes
-  const qs = new URLSearchParams({ collection, item: itemId, assets: asset, categorical: "true", max_size: String(maxSize) });
-  const data = await withStatsSlot(() =>
-    pc<{ properties?: { statistics?: Record<string, { histogram?: [number[], number[]] }> } }>(`${DATA}/item/statistics?${qs}`, {
-      method: "POST",
-      body: JSON.stringify({ type: "Feature", properties: {}, geometry }),
-      label: "Planetary Computer statistics",
-      timeoutMs: 45_000,
-    }),
-  );
-  const hist = Object.values(data.properties?.statistics ?? {})[0]?.histogram;
-  if (!hist) return {};
-  const [counts, values] = hist;
-  return Object.fromEntries(values.map((v, i) => [v, counts[i]]));
-}
-
-/**
  * Zonal statistics of one or more band-math expressions over a polygon, for one item.
  * `maxSize` caps the read resolution (pixels on the long side) to keep calls fast.
  */

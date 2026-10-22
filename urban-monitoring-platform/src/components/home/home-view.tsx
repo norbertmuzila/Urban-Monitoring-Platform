@@ -18,7 +18,6 @@ import {
   SatelliteDish,
   ServerCog,
   Sparkles,
-  Telescope,
   Trees,
 } from "lucide-react";
 import { useLocation } from "@/components/providers";
@@ -67,13 +66,6 @@ const MODULES = [
     icon: Trees,
     title: "Forests & fires",
     text: "Forest cover trends since 1990 for every country, global loss and gain rankings, and NASA active-fire detections from the last 24 hours.",
-    tone: "text-ok bg-ok/10 border-ok/20",
-  },
-  {
-    href: "/chipinge",
-    icon: Telescope,
-    title: "Chipinge observatory",
-    text: "The featured project: live year-on-year satellite monitoring of 7 forest sites, 10 m land-cover change since 2017, fires and fire weather in Chipinge District.",
     tone: "text-ok bg-ok/10 border-ok/20",
   },
   {
@@ -131,9 +123,9 @@ export function HomeView() {
             </span>
           </Link>
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Modules">
-            {MODULES.slice(0, 5).map((m) => (
+            {MODULES.slice(0, 4).map((m) => (
               <Link key={m.href} href={m.href} className="rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-fg">
-                {m.title.split(" &")[0].replace(" land", "").replace(" observatory", "")}
+                {m.title.split(" &")[0].replace(" land", "")}
               </Link>
             ))}
           </nav>
@@ -229,7 +221,7 @@ export function HomeView() {
         {/* ---------------------------------------------------------- modules */}
         <section>
           <h2 className="text-2xl font-semibold tracking-tight">Everything on the platform</h2>
-          <p className="mt-2 max-w-2xl text-muted">Six connected workspaces, all driven by live, open Earth-observation and environmental data.</p>
+          <p className="mt-2 max-w-2xl text-muted">Five connected workspaces, all driven by live, open Earth-observation and environmental data.</p>
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {MODULES.map((m) => (
               <Link key={m.href} href={m.href} className="group rounded-2xl border border-line bg-surface/70 p-6 transition-all hover:-translate-y-0.5 hover:border-line-strong hover:bg-surface">
@@ -309,12 +301,7 @@ export function HomeView() {
 
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-xs text-subtle sm:flex-row sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="rounded-md bg-white px-2 py-1">
-              <Image src="/brand/eurospacehub.png" alt="EuroSpaceHub" width={120} height={34} className="h-5 w-auto" />
-            </span>
-            <span>Urban Monitoring Platform · EuroMoonMars research programme</span>
-          </div>
+          <span>Urban Monitoring Platform · EuroMoonMars research programme</span>
           <span>Data © Copernicus/ESA, NASA, USGS, JAXA, ECMWF, World Bank, GeoNames, OpenStreetMap contributors</span>
         </div>
       </footer>

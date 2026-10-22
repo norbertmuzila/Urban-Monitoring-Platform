@@ -52,9 +52,6 @@ export function Sidebar() {
           Open Earth observation
         </div>
         <p className="mt-1.5 text-[11px] leading-relaxed text-subtle">Copernicus, NASA, USGS, JAXA, ECMWF and World Bank data — every figure links to its source.</p>
-        <div className="mt-3 flex items-center justify-center rounded-lg bg-white px-2 py-1.5">
-          <Image src="/brand/eurospacehub.png" alt="EuroSpaceHub" width={140} height={40} className="h-6 w-auto" />
-        </div>
       </div>
     </aside>
   );
@@ -65,7 +62,7 @@ export function MobileNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-[1100] grid grid-cols-7 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-[1100] grid grid-cols-6 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
     >
       {NAV_ITEMS.map((item) => {
         const active = isActive(item, pathname);
