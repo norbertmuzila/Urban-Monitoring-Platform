@@ -3,6 +3,7 @@ import countriesData from "@/lib/data/geo/countries.json";
 import citiesData from "@/lib/data/geo/cities.json";
 import shapesData from "@/lib/data/geo/shapes.json";
 import { inBBox, pointInGeometry, type BBox, type PolygonGeometry } from "@/lib/geo";
+import { CONTINENTS, NAME_FIXES, SOVEREIGN } from "@/lib/data/countries-meta";
 
 export interface StateInfo {
   code: string;
@@ -16,6 +17,8 @@ export interface CountryInfo {
   name: string;
   capital: string | null;
   continent: string;
+  /** True for the 195 sovereign countries (UN members + observer states); false for territories. */
+  sovereign: boolean;
   population: number;
   areaKm2: number;
   center: [number, number] | null;
@@ -39,7 +42,14 @@ export interface Place {
 
 type CityRow = [number, string, string, number, number, number];
 
-export const COUNTRIES = countriesData.countries as unknown as CountryInfo[];
+export const COUNTRIES: CountryInfo[] = (countriesData.countries as unknown as Omit<CountryInfo, "sovereign">[])
+  .map((c) => ({
+    ...c,
+    name: NAME_FIXES[c.iso2] ?? c.name.trim(),
+    continent: CONTINENTS[c.continent] ?? c.continent,
+    sovereign: SOVEREIGN.has(c.iso2),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name, "en"));
 export const GEO_SOURCES = { countries: countriesData.source, cities: citiesData.source, shapes: shapesData.source };
 
 const CITIES = citiesData.cities as unknown as Record<string, CityRow[]>;

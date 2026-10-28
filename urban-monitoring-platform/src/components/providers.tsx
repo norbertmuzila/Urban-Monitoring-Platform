@@ -30,8 +30,24 @@ const DEFAULT_SELECTION: Selection = { current: DEFAULT_LOCATION, recent: [DEFAU
 let cachedRaw: string | null = null;
 let cachedValue: Selection = DEFAULT_SELECTION;
 
-const isLocation = (l: unknown): l is Location =>
-  !!l && typeof l === "object" && typeof (l as Location).lat === "number" && typeof (l as Location).lng === "number" && typeof (l as Location).name === "string";
+/** Saved places from older releases or other tabs are only used if every field the pages rely on is valid. */
+const isLocation = (l: unknown): l is Location => {
+  if (!l || typeof l !== "object") return false;
+  const x = l as Location;
+  return (
+    typeof x.id === "number" &&
+    typeof x.name === "string" &&
+    x.name.length > 0 &&
+    typeof x.country === "string" &&
+    typeof x.iso2 === "string" &&
+    /^[A-Za-z]{2}$/.test(x.iso2) &&
+    Number.isFinite(x.lat) &&
+    Number.isFinite(x.lng) &&
+    Math.abs(x.lat) <= 90 &&
+    Math.abs(x.lng) <= 180 &&
+    (x.state == null || typeof x.state === "string")
+  );
+};
 
 function getSnapshot(): Selection {
   let raw: string | null = null;

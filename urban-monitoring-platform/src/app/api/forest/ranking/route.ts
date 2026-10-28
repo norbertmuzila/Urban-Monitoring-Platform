@@ -7,7 +7,7 @@ type WbRow = { countryiso3code: string; date: string; value: number | null };
 
 const URL = "https://api.worldbank.org/v2/country/all/indicator/AG.LND.FRST.K2?format=json&date=2000:2030&per_page=20000";
 
-/** Forest area change since 2000 for every country (World Bank / FAO FRA). */
+/** Forest area change since 2000 for every country with data (World Bank / FAO FRA). */
 async function forestChange() {
   "use cache";
   cacheLife("days");
@@ -19,7 +19,8 @@ async function forestChange() {
     if (r.value == null) continue;
     byIso3.set(r.countryiso3code, [...(byIso3.get(r.countryiso3code) ?? []), { year: Number(r.date), value: r.value }]);
   }
-  const rows = COUNTRIES.flatMap((c) => {
+  // Ranks sovereign countries only, so the count matches the 195 countries elsewhere on the platform.
+  const rows = COUNTRIES.filter((c) => c.sovereign).flatMap((c) => {
     const pts = (byIso3.get(c.iso3) ?? []).sort((a, b) => a.year - b.year);
     const first = pts.find((p) => p.year === 2000);
     const last = pts.at(-1);

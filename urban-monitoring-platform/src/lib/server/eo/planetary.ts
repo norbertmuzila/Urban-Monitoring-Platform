@@ -105,19 +105,24 @@ export async function searchScenes(q: SceneQuery): Promise<Scene[]> {
 
 /**
  * Registers a dynamic mosaic for a collection/time window. Tiles are composited from
- * matching scenes, least-cloudy first. Registration is cached: same inputs → same id.
+ * matching scenes, least-cloudy first.
+ *
+ * Planetary Computer issues search ids that expire after 24 h (`pc1.<expiry>.<token>`),
+ * so a cached id is replaced well before then: at most 8 h here, plus the edge cache of
+ * the tiles response, keeps every tile URL handed to a browser valid.
  */
 export async function registerMosaic(q: Pick<SceneQuery, "collection" | "start" | "end" | "maxCloud" | "filter">): Promise<string> {
   "use cache";
-  cacheLife({ stale: 3600, revalidate: 21600, expire: 172800 });
+  cacheLife({ stale: 600, revalidate: 7200, expire: 28800 });
   const filter = cqlFilter(q);
   const body = {
     collections: [q.collection],
     ...(filter ? { "filter-lang": "cql2-json", filter } : {}),
     sortby: q.maxCloud != null ? [{ field: "eo:cloud_cover", direction: "asc" }] : [{ field: "datetime", direction: "desc" }],
   };
-  const data = await pc<{ id: string }>(`${DATA}/mosaic/register`, { method: "POST", body: JSON.stringify(body), label: "Planetary Computer mosaic" });
-  return data.id;
+  const data = await pc<{ id: string; searchid?: string }>(`${DATA}/mosaic/register`, { method: "POST", body: JSON.stringify(body), label: "Planetary Computer mosaic" });
+  // `searchid` is the id tiles are served under; the bare `id` hash is no longer accepted.
+  return data.searchid ?? data.id;
 }
 
 /** Leaflet tile template for a registered mosaic (PNG keeps nodata transparent). */

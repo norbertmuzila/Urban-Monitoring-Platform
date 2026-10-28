@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 export function Card({ className, children, ...rest }: React.ComponentProps<"section">) {
   return (
     <section
-      className={cn("rounded-[var(--radius-card)] border border-line bg-surface/80 backdrop-blur-sm", className)}
+      className={cn("min-w-0 rounded-[var(--radius-card)] border border-line bg-surface/80 backdrop-blur-sm", className)}
       {...rest}
     >
       {children}
@@ -26,8 +26,8 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <header className={cn("flex items-start justify-between gap-3 px-5 pt-4 pb-3", className)}>
-      <div className="flex min-w-0 items-start gap-2.5">
+    <header className={cn("flex flex-wrap items-start justify-between gap-x-3 gap-y-2 px-5 pt-4 pb-3", className)}>
+      <div className="flex min-w-0 flex-1 basis-48 items-start gap-2.5">
         {Icon && (
           <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg border border-line bg-surface-2 text-muted">
             <Icon className="size-3.5" strokeWidth={2} aria-hidden />

@@ -1,4 +1,4 @@
-# Urban Monitoring Platform · v2.3
+# Urban Monitoring Platform · v2.4
 
 Live environmental intelligence for every city on Earth — air quality, weather, satellite imagery,
 forests and fires — with predictions you can verify. Built for the EuroMoonMars programme as the
@@ -26,7 +26,8 @@ query strings still open the right view and are then tidied. Old v2.0 routes (`/
 
 ## Locations
 
-246 countries and territories, 3,837 states/provinces and 171,503 populated places (≥ 1,000 people)
+195 countries (the 193 UN member states plus the observer states Vatican City and Palestine) and
+51 territories (e.g. Puerto Rico, Greenland, Hong Kong), 3,837 states/provinces and 171,503 populated places (≥ 1,000 people)
 from GeoNames, bundled as a snapshot (`npm run data:geo` to refresh). Any smaller town or village
 is found by typing — the picker queries the GeoNames-based geocoder restricted to the chosen country.
 
@@ -66,7 +67,7 @@ Open-Meteo · Planetary Computer · NASA FIRMS · World Bank · RainViewer · bu
 
 | Endpoint                                              | Description                                               |
 | ----------------------------------------------------- | --------------------------------------------------------- |
-| `GET /api/geo/countries`                              | All countries & territories                               |
+| `GET /api/geo/countries`                              | 195 countries + 51 territories (`sovereign` flag)          |
 | `GET /api/geo/countries/:iso2`                        | Country with states/provinces and largest cities          |
 | `GET /api/geo/countries/:iso2/cities[?state=]`        | Cities ≥ 1,000 people, largest first                      |
 | `GET /api/geocode?q=&country=`                        | Place search, optionally within one country               |

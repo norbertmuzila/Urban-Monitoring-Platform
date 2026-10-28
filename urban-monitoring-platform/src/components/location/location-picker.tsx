@@ -27,16 +27,21 @@ export function LocationPicker({
   value,
   onSelect,
   layout = "row",
+  autoSelect = false,
   className,
 }: {
   value: Location;
   onSelect: (loc: Location) => void;
   layout?: "row" | "stack";
+  /** Switch to the capital (or a state's largest city) as soon as a country or state is chosen. */
+  autoSelect?: boolean;
   className?: string;
 }) {
   const [iso2, setIso2] = useState(value.iso2);
   const [state, setState] = useState<string | null>(null);
   const [cityQuery, setCityQuery] = useState("");
+  // Set when the viewer picks a country or state; cleared once a city has been chosen for it.
+  const [pending, setPending] = useState<"country" | "state" | null>(null);
   const debounced = useDebounced(cityQuery, 300);
 
   // Follow external changes (e.g. a recent place picked elsewhere); keep the state filter
@@ -60,7 +65,7 @@ export function LocationPicker({
       (countries.data?.countries ?? []).map((c) => ({
         value: c.iso2,
         label: c.name,
-        hint: [c.capital, c.continent].filter(Boolean).join(" · "),
+        hint: [c.sovereign ? c.capital : "Territory", c.continent].filter(Boolean).join(" · "),
         meta: c.population ? nf.format(c.population) : undefined,
         icon: <Flag iso2={c.iso2.toLowerCase()} className="h-3.5 w-5" />,
       })),
@@ -97,6 +102,17 @@ export function LocationPicker({
 
   const countryName = countries.data?.countries.find((c) => c.iso2 === iso2)?.name ?? value.country;
 
+  // Auto-select: once the chosen country's (or state's) city list has loaded, open its capital or largest city.
+  useEffect(() => {
+    if (!autoSelect || !pending) return;
+    const list = cities.data?.cities;
+    if (!list || (list[0] && list[0].countryIso2 !== iso2)) return;
+    setPending(null); // eslint-disable-line react-hooks/set-state-in-effect
+    const capital = pending === "country" ? country.data?.country.capital : null;
+    const c = (capital && list.find((x) => x.name === capital)) || list[0];
+    if (c) onSelect({ id: c.id, name: c.name, state: c.state || null, country: c.country, iso2: c.countryIso2, lat: c.lat, lng: c.lng, population: c.population });
+  }, [autoSelect, pending, cities.data, country.data, iso2, onSelect]);
+
   const pickCity = (val: string) => {
     if (val.startsWith("g")) {
       const r = geo.data?.results.find((x) => `g${x.id}` === val);
@@ -118,6 +134,7 @@ export function LocationPicker({
         onChange={(v) => {
           setIso2(v);
           setState(null);
+          setPending("country");
         }}
       />
       <Combobox
@@ -128,7 +145,10 @@ export function LocationPicker({
         loading={country.isLoading}
         disabled={!country.data}
         emptyText="This country has no listed subdivisions"
-        onChange={(v) => setState(v === "*" ? null : v)}
+        onChange={(v) => {
+          setState(v === "*" ? null : v);
+          setPending(v === "*" ? "country" : "state");
+        }}
       />
       <Combobox
         label="City or town"

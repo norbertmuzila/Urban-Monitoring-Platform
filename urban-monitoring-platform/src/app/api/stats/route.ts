@@ -16,7 +16,8 @@ export const GET = handle(async () => {
   return json(
     {
       coverage: {
-        countries: COUNTRIES.length,
+        countries: COUNTRIES.filter((c) => c.sovereign).length,
+        territories: COUNTRIES.filter((c) => !c.sovereign).length,
         states: COUNTRIES.reduce((s, c) => s + c.states.length, 0),
         cities: COUNTRIES.reduce((s, c) => s + c.cityCount, 0),
         satelliteLayers: EO_LAYERS.length,

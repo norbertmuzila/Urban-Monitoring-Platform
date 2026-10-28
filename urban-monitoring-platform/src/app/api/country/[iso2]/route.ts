@@ -36,6 +36,7 @@ export const GET = handle(async (_req: Request, ctx: RouteContext<"/api/country/
         : null,
       sources: GEO_SOURCES,
     },
-    { sMaxAge: 1800, staleWhileRevalidate: 7200 },
+    // Without the fire figures the answer is partial: keep it out of the edge cache so the next request completes it.
+    fires ? { sMaxAge: 1800, staleWhileRevalidate: 7200 } : { sMaxAge: 30 },
   );
 });

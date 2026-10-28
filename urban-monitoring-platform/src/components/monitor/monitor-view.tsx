@@ -53,7 +53,7 @@ export function MonitorView({ initial }: { initial: Location | null }) {
       {/* -------------------------------------------------------------- picker */}
       <Card className="relative z-20">
         <CardBody className="space-y-4 pt-5">
-          <LocationPicker value={location} onSelect={select} />
+          <LocationPicker value={location} onSelect={select} autoSelect />
           {recent.length > 1 && (
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-[11px] text-subtle">Recent</span>
@@ -127,7 +127,7 @@ export function MonitorView({ initial }: { initial: Location | null }) {
       {/* --------------------------------------------------------------- KPIs */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         <StatCard icon={Thermometer} tone="alert" label="Temperature" value={fmt.dp(env?.temperature)} unit="°C" hint={env?.apparentTemperature != null ? `Feels like ${env.apparentTemperature.toFixed(1)} °C` : undefined} loading={loading} />
-        <StatCard icon={Gauge} tone="danger" label="Air quality (EAQI)" value={env?.aqi ?? "—"} valueColor={band.color} hint={band.label} loading={loading} />
+        <StatCard icon={Gauge} tone="danger" label="Air quality" value={env?.aqi ?? "—"} valueColor={band.color} hint={`EAQI · ${band.label}`} loading={loading} />
         <StatCard icon={FlaskConical} tone="violet" label="PM2.5" value={fmt.dp(env?.pollutants.pm25)} unit="µg/m³" valueColor={pm25Band(env?.pollutants.pm25 ?? null)?.color} hint={pm25Band(env?.pollutants.pm25 ?? null)?.label} loading={loading} />
         <StatCard icon={Droplets} tone="accent" label="Humidity" value={fmt.int(env?.humidity)} unit="%" hint={env?.precipitation ? `${env.precipitation} mm rain now` : `${fmt.int(env?.cloudCover)}% cloud cover`} loading={loading} />
         <StatCard icon={Wind} tone="sky" label="Wind" value={fmt.dp(env?.windSpeed)} unit="km/h" hint={env?.windDirection != null ? `From ${compass(env.windDirection)} (${Math.round(env.windDirection)}°)` : undefined} loading={loading} />

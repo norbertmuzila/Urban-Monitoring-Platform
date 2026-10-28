@@ -1,7 +1,7 @@
 import { handle, json } from "@/lib/server/http";
 import { COUNTRIES, GEO_SOURCES } from "@/lib/server/geo";
 
-/** GET /api/geo/countries — every country and territory (GeoNames). */
+/** GET /api/geo/countries — 195 countries plus territories (GeoNames), each flagged `sovereign`. */
 export const GET = handle(async () =>
   json(
     {

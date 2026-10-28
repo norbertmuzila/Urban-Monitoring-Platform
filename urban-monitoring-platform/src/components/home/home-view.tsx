@@ -20,6 +20,7 @@ import { LocationPicker } from "@/components/location/location-picker";
 type Stats = {
   coverage: {
     countries: number;
+    territories: number;
     states: number;
     cities: number;
     satelliteLayers: number;
@@ -152,7 +153,7 @@ export function HomeView() {
             <div className="grid grid-cols-2 gap-3">
               {[
                 {
-                  k: "Countries & territories",
+                  k: stats ? `Countries · plus ${stats.coverage.territories} territories` : "Countries",
                   v: stats ? nf.format(stats.coverage.countries) : null,
                   icon: Globe2,
                 },

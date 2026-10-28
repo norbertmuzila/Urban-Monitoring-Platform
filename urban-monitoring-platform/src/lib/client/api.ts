@@ -32,8 +32,11 @@ export async function fetcher<T>(url: string): Promise<T> {
   return body as T;
 }
 
-const live: SWRConfiguration = { refreshInterval: 300_000, revalidateOnFocus: true, keepPreviousData: true };
-const stable: SWRConfiguration = { revalidateOnFocus: false, keepPreviousData: true };
+// Place-specific data never keeps the previous place's values on screen while the new place loads.
+const live: SWRConfiguration = { refreshInterval: 300_000, revalidateOnFocus: true };
+const stable: SWRConfiguration = { revalidateOnFocus: false };
+// Map layers may keep the previous imagery visible while the next one is prepared.
+const smooth: SWRConfiguration = { revalidateOnFocus: false, keepPreviousData: true };
 
 export const useHealth = () => useSWR<HealthReport>("/api/health", fetcher, { refreshInterval: 60_000 });
 
@@ -90,7 +93,9 @@ export interface CountryProfile {
   sources: { countries: string; cities: string; shapes: string };
 }
 
-export const useCountryProfile = (iso2: string | null) => useSWR<CountryProfile>(iso2 ? `/api/country/${iso2}` : null, fetcher, stable);
+// Polls briefly until the live fire figures have joined the profile.
+export const useCountryProfile = (iso2: string | null) =>
+  useSWR<CountryProfile>(iso2 ? `/api/country/${iso2}` : null, fetcher, { ...stable, refreshInterval: (d) => (d && !d.fires ? 15_000 : 0) });
 
 type Feature<G, P> = { type: "Feature"; id?: string; properties: P; geometry: G };
 
@@ -112,13 +117,13 @@ export const useEoLayers = () =>
 const eoQuery = (layer: string, days: number, end: string) => `layer=${encodeURIComponent(layer)}&days=${days}&end=${end}`;
 
 export const useEoTiles = (layer: string | null, days: number, end: string) =>
-  useSWR<ResolvedLayer>(layer ? `/api/eo/tiles?${eoQuery(layer, days, end)}` : null, fetcher, stable);
+  useSWR<ResolvedLayer>(layer ? `/api/eo/tiles?${eoQuery(layer, days, end)}` : null, fetcher, smooth);
 
 export const useEoScenes = (layer: string | null, days: number, end: string, bbox: [number, number, number, number] | null) =>
   useSWR<{ scenes: Scene[] }>(
     layer && bbox ? `/api/eo/scenes?${eoQuery(layer, days, end)}&bbox=${bbox.map((n) => n.toFixed(3)).join(",")}` : null,
     fetcher,
-    stable,
+    smooth,
   );
 
 export const useEoStatus = () => useSWR<{ checkedAt: string; sensors: SensorStatus[]; areas: string[] }>("/api/eo/status", fetcher, { refreshInterval: 600_000 });
