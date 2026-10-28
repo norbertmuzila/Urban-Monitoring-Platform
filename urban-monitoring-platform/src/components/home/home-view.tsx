@@ -54,7 +54,7 @@ const MODULES = [
     href: "/explorer",
     icon: SatelliteDish,
     title: "Satellite explorer",
-    text: "15 live layers from Sentinel-1/2, Landsat 8/9, ALOS-2, Copernicus DEM and VIIRS, with before/after swipe.",
+    text: "15 live layers from Sentinel-1/2, Landsat 8/9, ALOS-2, ALOS World 3D and VIIRS, with before/after swipe.",
     tone: "text-violet bg-violet/10 border-violet/20",
   },
   {

@@ -14,7 +14,7 @@ Lucide icons · Chart.js · Leaflet · SWR · Zod — deployed on Vercel. No API
 | ------------ | --------------------------------------------------------------------------------------------------------------- |
 | `/`          | Overview of the whole platform: live counters, quick location picker, module guide, live satellites and fires   |
 | `/dashboard` | **City monitor** — pick any country → state/province → city/town; live conditions, 72 h prediction with verified accuracy, satellite view, largest cities in the country, World Bank context |
-| `/explorer`  | Satellite explorer — 15 live layers (Sentinel-1/2, Landsat 8/9, ALOS-2, Copernicus DEM, ESA WorldCover, VIIRS) with before/after swipe |
+| `/explorer`  | Satellite explorer — 15 live layers (Sentinel-1/2, Landsat 8/9, ALOS-2, ALOS World 3D DEM, ESA WorldCover, VIIRS) with before/after swipe |
 | `/forests`   | Forests & fires for every country — forest area 1990–latest, change since 2000 ranking, NASA VIIRS fires (24 h) |
 | `/zimbabwe`  | Zimbabwe land & mining watch — 91 districts, VIIRS fires, OSM mine sites, per-district satellite screening      |
 | `/sources`   | Data sources, licences, live service health and latest satellite acquisitions                                   |
