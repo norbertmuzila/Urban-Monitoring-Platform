@@ -11,6 +11,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Segmented } from "@/components/ui/segmented";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EoLegendView } from "@/components/eo/eo-legend";
+import { PanelBoundary } from "@/components/ui/panel-boundary";
 
 const EoMapCanvas = dynamic(() => import("@/components/eo/eo-map-canvas"), { ssr: false, loading: () => <Skeleton className="size-full rounded-none" /> });
 
@@ -40,15 +41,26 @@ export function CitySatellite({ location }: { location: Location }) {
       />
       <CardBody className="space-y-3">
         <div className="relative h-80 overflow-hidden rounded-xl border border-line">
-          <EoMapCanvas
-            basemap="dark"
-            target={target}
-            after={tiles.data ? { url: tiles.data.tileUrl, maxNativeZoom: tiles.data.maxNativeZoom, minZoom: tiles.data.layer.minZoom ?? 0, attribution: tiles.data.layer.attribution } : null}
-            before={null}
-            ratio={0.5}
-            opacity={0.95}
-            onView={() => {}}
-          />
+          <PanelBoundary label="The map" className="size-full">
+            <EoMapCanvas
+              basemap="dark"
+              target={target}
+              after={
+                tiles.data
+                  ? {
+                      url: tiles.data.tileUrl,
+                      maxNativeZoom: tiles.data.maxNativeZoom,
+                      minZoom: tiles.data.layer.minZoom ?? 0,
+                      attribution: tiles.data.layer.attribution,
+                    }
+                  : null
+              }
+              before={null}
+              ratio={0.5}
+              opacity={0.95}
+              onView={() => {}}
+            />
+          </PanelBoundary>
           {tiles.data?.layer.legend && (
             <div className="absolute bottom-2 left-2 z-[1000] w-52 rounded-lg border border-line-strong bg-surface/95 p-2.5 backdrop-blur">
               <EoLegendView legend={tiles.data.layer.legend} compact />

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
+import { moveTo } from "./safe-move";
 
 /**
  * Animates the map to a target when it changes. Skips no-op flights (e.g. on mount,
@@ -13,8 +14,7 @@ export function FlyTo({ lat, lng, zoom }: { lat: number; lng: number; zoom: numb
   useEffect(() => {
     const here = map.getCenter();
     if (map.getZoom() === zoom && Math.abs(here.lat - lat) < 1e-6 && Math.abs(here.lng - lng) < 1e-6) return;
-    map.stop();
-    map.flyTo([lat, lng], zoom, { duration: 1.2 });
+    moveTo(map, [lat, lng], zoom, 1.2);
   }, [map, lat, lng, zoom]);
   return null;
 }

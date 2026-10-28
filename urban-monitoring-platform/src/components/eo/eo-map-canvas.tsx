@@ -25,10 +25,14 @@ function SwipeClip({ pane, ratio }: { pane: string; ratio: number }) {
     const el = map.getPane(pane);
     if (!el) return;
     const update = () => {
-      const size = map.getSize();
-      const nw = map.containerPointToLayerPoint([0, 0]);
-      const se = map.containerPointToLayerPoint(size);
-      el.style.clip = `rect(${nw.y}px, ${nw.x + size.x * ratio}px, ${se.y}px, ${nw.x}px)`;
+      try {
+        const size = map.getSize();
+        const nw = map.containerPointToLayerPoint([0, 0]);
+        const se = map.containerPointToLayerPoint(size);
+        el.style.clip = `rect(${nw.y}px, ${nw.x + size.x * ratio}px, ${se.y}px, ${nw.x}px)`;
+      } catch {
+        /* map not laid out yet */
+      }
     };
     update();
     map.on("move zoom resize", update);
@@ -45,8 +49,13 @@ function ViewReporter({ onView }: { onView: (v: MapView) => void }) {
     moveend: () => report(),
   });
   const report = () => {
-    const b = map.getBounds();
-    onView({ bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], zoom: map.getZoom() });
+    try {
+      const b = map.getBounds();
+      const bbox: MapView["bbox"] = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
+      if (bbox.every(Number.isFinite)) onView({ bbox, zoom: map.getZoom() });
+    } catch {
+      /* map not laid out yet; the next moveend reports */
+    }
   };
   useEffect(report, []); // eslint-disable-line react-hooks/exhaustive-deps
   return null;

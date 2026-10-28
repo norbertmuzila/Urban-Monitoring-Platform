@@ -23,6 +23,7 @@ import { CitySatellite } from "./city-satellite";
 import { CountryCities } from "./country-cities";
 import { CountryContext } from "./country-context";
 import { PredictionsPanel } from "./predictions-panel";
+import { PanelBoundary } from "@/components/ui/panel-boundary";
 
 const POLLUTANTS = [
   { key: "pm25", label: "PM2.5", color: palette.violet },
@@ -70,7 +71,12 @@ export function MonitorView({ initial }: { initial: Location | null }) {
                     {r.name}
                   </button>
                   {r.id !== location.id && (
-                    <button type="button" onClick={() => forget(r)} aria-label={`Remove ${r.name}`} className="rounded p-0.5 text-subtle hover:bg-surface-3 hover:text-fg">
+                    <button
+                      type="button"
+                      onClick={() => forget(r)}
+                      aria-label={`Remove ${r.name}`}
+                      className="rounded p-0.5 text-subtle hover:bg-surface-3 hover:text-fg"
+                    >
                       <X className="size-3" aria-hidden />
                     </button>
                   )}
@@ -126,17 +132,52 @@ export function MonitorView({ initial }: { initial: Location | null }) {
 
       {/* --------------------------------------------------------------- KPIs */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <StatCard icon={Thermometer} tone="alert" label="Temperature" value={fmt.dp(env?.temperature)} unit="°C" hint={env?.apparentTemperature != null ? `Feels like ${env.apparentTemperature.toFixed(1)} °C` : undefined} loading={loading} />
+        <StatCard
+          icon={Thermometer}
+          tone="alert"
+          label="Temperature"
+          value={fmt.dp(env?.temperature)}
+          unit="°C"
+          hint={env?.apparentTemperature != null ? `Feels like ${env.apparentTemperature.toFixed(1)} °C` : undefined}
+          loading={loading}
+        />
         <StatCard icon={Gauge} tone="danger" label="Air quality" value={env?.aqi ?? "—"} valueColor={band.color} hint={`EAQI · ${band.label}`} loading={loading} />
-        <StatCard icon={FlaskConical} tone="violet" label="PM2.5" value={fmt.dp(env?.pollutants.pm25)} unit="µg/m³" valueColor={pm25Band(env?.pollutants.pm25 ?? null)?.color} hint={pm25Band(env?.pollutants.pm25 ?? null)?.label} loading={loading} />
-        <StatCard icon={Droplets} tone="accent" label="Humidity" value={fmt.int(env?.humidity)} unit="%" hint={env?.precipitation ? `${env.precipitation} mm rain now` : `${fmt.int(env?.cloudCover)}% cloud cover`} loading={loading} />
-        <StatCard icon={Wind} tone="sky" label="Wind" value={fmt.dp(env?.windSpeed)} unit="km/h" hint={env?.windDirection != null ? `From ${compass(env.windDirection)} (${Math.round(env.windDirection)}°)` : undefined} loading={loading} />
+        <StatCard
+          icon={FlaskConical}
+          tone="violet"
+          label="PM2.5"
+          value={fmt.dp(env?.pollutants.pm25)}
+          unit="µg/m³"
+          valueColor={pm25Band(env?.pollutants.pm25 ?? null)?.color}
+          hint={pm25Band(env?.pollutants.pm25 ?? null)?.label}
+          loading={loading}
+        />
+        <StatCard
+          icon={Droplets}
+          tone="accent"
+          label="Humidity"
+          value={fmt.int(env?.humidity)}
+          unit="%"
+          hint={env?.precipitation ? `${env.precipitation} mm rain now` : `${fmt.int(env?.cloudCover)}% cloud cover`}
+          loading={loading}
+        />
+        <StatCard
+          icon={Wind}
+          tone="sky"
+          label="Wind"
+          value={fmt.dp(env?.windSpeed)}
+          unit="km/h"
+          hint={env?.windDirection != null ? `From ${compass(env.windDirection)} (${Math.round(env.windDirection)}°)` : undefined}
+          loading={loading}
+        />
         <StatCard icon={Navigation} tone="ok" label="Pressure" value={fmt.int(env?.pressure)} unit="hPa" hint="Surface pressure" loading={loading} />
       </div>
 
       {/* --------------------------------------------------------- prediction */}
       <div className="grid gap-5 xl:grid-cols-[3fr_2fr]">
-        <PredictionsPanel location={location} />
+        <PanelBoundary label="The prediction">
+          <PredictionsPanel location={location} />
+        </PanelBoundary>
         <div className="space-y-5">
           <Card>
             <CardHeader icon={FlaskConical} title="Pollutant mix right now" subtitle="Surface concentrations, µg/m³" action={<Badge tone="accent">CAMS</Badge>} />
@@ -145,7 +186,15 @@ export function MonitorView({ initial }: { initial: Location | null }) {
                 <Bar
                   data={{
                     labels: POLLUTANTS.map((p) => p.label),
-                    datasets: [{ label: "µg/m³", data: POLLUTANTS.map((p) => env.pollutants[p.key]), backgroundColor: POLLUTANTS.map((p) => p.color), borderRadius: 6, maxBarThickness: 40 }],
+                    datasets: [
+                      {
+                        label: "µg/m³",
+                        data: POLLUTANTS.map((p) => env.pollutants[p.key]),
+                        backgroundColor: POLLUTANTS.map((p) => p.color),
+                        borderRadius: 6,
+                        maxBarThickness: 40,
+                      },
+                    ],
                   }}
                   options={cartesian({ legend: false }) as never}
                 />
@@ -158,7 +207,13 @@ export function MonitorView({ initial }: { initial: Location | null }) {
             <CardHeader icon={Gauge} title="European AQI scale" />
             <CardBody className="space-y-1.5">
               {AQI_LEGEND.map((b) => (
-                <div key={b.label} className={cn("flex items-center justify-between rounded-md px-2 py-1 text-xs", env && aqiBand(env.aqi).label === b.label && "bg-surface-3 ring-1 ring-line-strong")}>
+                <div
+                  key={b.label}
+                  className={cn(
+                    "flex items-center justify-between rounded-md px-2 py-1 text-xs",
+                    env && aqiBand(env.aqi).label === b.label && "bg-surface-3 ring-1 ring-line-strong",
+                  )}
+                >
                   <span className="flex items-center gap-2">
                     <span className="size-2.5 rounded-full" style={{ background: b.color }} />
                     {b.label}
@@ -172,11 +227,17 @@ export function MonitorView({ initial }: { initial: Location | null }) {
       </div>
 
       <div className="grid gap-5 xl:grid-cols-2">
-        <CitySatellite location={location} />
-        <CountryCities location={location} onSelect={select} />
+        <PanelBoundary label="The satellite view">
+          <CitySatellite location={location} />
+        </PanelBoundary>
+        <PanelBoundary label="The city list">
+          <CountryCities location={location} onSelect={select} />
+        </PanelBoundary>
       </div>
 
-      <CountryContext iso2={location.iso2} name={location.country} />
+      <PanelBoundary label="The country overview">
+        <CountryContext iso2={location.iso2} name={location.country} />
+      </PanelBoundary>
 
       {env && (
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-subtle">

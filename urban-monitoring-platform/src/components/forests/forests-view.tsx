@@ -19,6 +19,7 @@ import { StatCard } from "@/components/ui/stat-card";
 import { grid } from "@/components/charts/setup";
 import { Combobox } from "@/components/location/combobox";
 import { EoLegendView } from "@/components/eo/eo-legend";
+import { PanelBoundary } from "@/components/ui/panel-boundary";
 
 const ForestMapCanvas = dynamic(() => import("./forest-map-canvas"), { ssr: false, loading: () => <Skeleton className="size-full rounded-none" /> });
 
@@ -70,7 +71,7 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
   const km2 = ind?.forestKm2.points ?? [];
   const pct = ind?.forestPct.points ?? [];
   const first = km2[0];
-  const last = km2.at(-1);
+  const last = km2.length ? km2[km2.length - 1] : undefined;
   const since = first && last && first.value > 0 ? ((last.value - first.value) / first.value) * 100 : null;
   const tenAgo = last ? km2.find((p) => p.year === last.year - 10) : undefined;
   const perYear = last && tenAgo ? (last.value - tenAgo.value) / 10 : null;
@@ -86,7 +87,6 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
       })),
     [countries.data],
   );
-
 
   return (
     <>
@@ -106,7 +106,15 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
 
       <Card className="relative z-20">
         <CardBody className="flex flex-col gap-4 pt-5 md:flex-row md:items-end">
-          <Combobox label="Country" placeholder="Choose a country" items={countryItems} value={iso2} loading={countries.isLoading} onChange={setIso2} className="md:w-96" />
+          <Combobox
+            label="Country"
+            placeholder="Choose a country"
+            items={countryItems}
+            value={iso2}
+            loading={countries.isLoading}
+            onChange={setIso2}
+            className="md:w-96"
+          />
           {profile.data && (
             <div className="flex items-center gap-3 md:ml-4">
               <Flag iso2={iso2.toLowerCase()} className="h-8 w-11 rounded" />
@@ -133,8 +141,24 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
       )}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <StatCard icon={TreePine} tone="ok" label="Forest cover" value={ind?.forestPct.latest ? ind.forestPct.latest.value.toFixed(1) : "—"} unit="%" hint={ind?.forestPct.latest ? `of land area · ${ind.forestPct.latest.year}` : profile.isLoading ? undefined : "no data"} loading={profile.isLoading} />
-        <StatCard icon={TreePine} tone="accent" label="Forest area" value={last ? nf.format(last.value) : "—"} unit="km²" hint={last ? String(last.year) : profile.isLoading ? undefined : "no data"} loading={profile.isLoading} />
+        <StatCard
+          icon={TreePine}
+          tone="ok"
+          label="Forest cover"
+          value={ind?.forestPct.latest ? ind.forestPct.latest.value.toFixed(1) : "—"}
+          unit="%"
+          hint={ind?.forestPct.latest ? `of land area · ${ind.forestPct.latest.year}` : profile.isLoading ? undefined : "no data"}
+          loading={profile.isLoading}
+        />
+        <StatCard
+          icon={TreePine}
+          tone="accent"
+          label="Forest area"
+          value={last ? nf.format(last.value) : "—"}
+          unit="km²"
+          hint={last ? String(last.year) : profile.isLoading ? undefined : "no data"}
+          loading={profile.isLoading}
+        />
         <StatCard
           icon={since != null && since < 0 ? TrendingDown : TrendingUp}
           tone={since != null && since < 0 ? "danger" : "ok"}
@@ -144,9 +168,32 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
           hint={first && last ? `${nf.format(last.value - first.value)} km²` : undefined}
           loading={profile.isLoading}
         />
-        <StatCard icon={ChartLine} tone="warn" label="Last 10 years" value={perYear != null ? `${perYear > 0 ? "+" : ""}${nf.format(perYear)}` : "—"} unit="km²/yr" hint="Average annual net change" loading={profile.isLoading} />
-        <StatCard icon={ShieldCheck} tone="violet" label="Protected land" value={ind?.protectedPct.latest ? ind.protectedPct.latest.value.toFixed(1) : "—"} unit="%" hint={ind?.protectedPct.latest ? `terrestrial · ${ind.protectedPct.latest.year}` : profile.isLoading ? undefined : "no data"} loading={profile.isLoading} />
-        <StatCard icon={Flame} tone="alert" label="Active fires · 24 h" value={profile.data?.fires ? fmt.int(profile.data.fires.last24h) : fires.data ? fmt.int(fires.data.meta.total) : "—"} hint={profile.data?.fires ? `${profile.data.fires.highFrp} intense · ${profile.data.fires.night} at night` : "NASA FIRMS VIIRS"} loading={profile.isLoading && !fires.data} />
+        <StatCard
+          icon={ChartLine}
+          tone="warn"
+          label="Last 10 years"
+          value={perYear != null ? `${perYear > 0 ? "+" : ""}${nf.format(perYear)}` : "—"}
+          unit="km²/yr"
+          hint="Average annual net change"
+          loading={profile.isLoading}
+        />
+        <StatCard
+          icon={ShieldCheck}
+          tone="violet"
+          label="Protected land"
+          value={ind?.protectedPct.latest ? ind.protectedPct.latest.value.toFixed(1) : "—"}
+          unit="%"
+          hint={ind?.protectedPct.latest ? `terrestrial · ${ind.protectedPct.latest.year}` : profile.isLoading ? undefined : "no data"}
+          loading={profile.isLoading}
+        />
+        <StatCard
+          icon={Flame}
+          tone="alert"
+          label="Active fires · 24 h"
+          value={profile.data?.fires ? fmt.int(profile.data.fires.last24h) : fires.data ? fmt.int(fires.data.meta.total) : "—"}
+          hint={profile.data?.fires ? `${profile.data.fires.highFrp} intense · ${profile.data.fires.night} at night` : "NASA FIRMS VIIRS"}
+          loading={profile.isLoading && !fires.data}
+        />
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[3fr_2fr]">
@@ -170,8 +217,26 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
                 data={{
                   labels: km2.map((p) => p.year),
                   datasets: [
-                    { type: "bar", label: "Forest area (km²)", data: km2.map((p) => p.value), backgroundColor: "rgba(52,211,153,0.55)", borderRadius: 3, yAxisID: "y", order: 2 },
-                    { type: "line", label: "% of land area", data: km2.map((p) => pct.find((q) => q.year === p.year)?.value ?? null), borderColor: palette.warn, borderWidth: 2, pointRadius: 0, tension: 0.3, yAxisID: "y1", order: 1 },
+                    {
+                      type: "bar",
+                      label: "Forest area (km²)",
+                      data: km2.map((p) => p.value),
+                      backgroundColor: "rgba(52,211,153,0.55)",
+                      borderRadius: 3,
+                      yAxisID: "y",
+                      order: 2,
+                    },
+                    {
+                      type: "line",
+                      label: "% of land area",
+                      data: km2.map((p) => pct.find((q) => q.year === p.year)?.value ?? null),
+                      borderColor: palette.warn,
+                      borderWidth: 2,
+                      pointRadius: 0,
+                      tension: 0.3,
+                      yAxisID: "y1",
+                      order: 1,
+                    },
                   ],
                 }}
                 options={{
@@ -195,7 +260,11 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
         </Card>
 
         <Card>
-          <CardHeader icon={Trophy} title="Forest change since 2000" subtitle={ranking.data ? `${ranking.data.countries} countries · click to explore` : "World Bank / FAO"} />
+          <CardHeader
+            icon={Trophy}
+            title="Forest change since 2000"
+            subtitle={ranking.data ? `${ranking.data.countries} countries · click to explore` : "World Bank / FAO"}
+          />
           <CardBody className="space-y-4">
             {!ranking.data ? (
               <Skeleton className="h-72 w-full" />
@@ -223,7 +292,11 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
         <CardHeader
           icon={MapIcon}
           title={`Fires and land cover — ${name}`}
-          subtitle={fires.data ? `${fmt.int(fires.data.meta.total)} VIIRS detections in the last 24 h${fires.data.meta.total > 5000 ? " (strongest 5,000 shown)" : ""}` : "Loading NASA FIRMS…"}
+          subtitle={
+            fires.data
+              ? `${fmt.int(fires.data.meta.total)} VIIRS detections in the last 24 h${fires.data.meta.total > 5000 ? " (strongest 5,000 shown)" : ""}`
+              : "Loading NASA FIRMS…"
+          }
           action={
             <Segmented
               label="Underlay"
@@ -239,11 +312,17 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
         />
         <CardBody>
           <div className="relative h-[480px] overflow-hidden rounded-xl border border-line">
-            <ForestMapCanvas
-              shape={shape.data}
-              fires={fires.data}
-              underlay={eo.data ? { url: eo.data.tileUrl, maxNativeZoom: eo.data.maxNativeZoom, minZoom: eo.data.layer.minZoom ?? 0, attribution: eo.data.layer.attribution } : null}
-            />
+            <PanelBoundary label="The map" className="size-full">
+              <ForestMapCanvas
+                shape={shape.data}
+                fires={fires.data}
+                underlay={
+                  eo.data
+                    ? { url: eo.data.tileUrl, maxNativeZoom: eo.data.maxNativeZoom, minZoom: eo.data.layer.minZoom ?? 0, attribution: eo.data.layer.attribution }
+                    : null
+                }
+              />
+            </PanelBoundary>
             {eo.data?.layer.legend && underlay !== "none" && (
               <div className="absolute bottom-3 left-3 z-[1000] w-64 rounded-xl border border-line-strong bg-surface/95 p-3 backdrop-blur">
                 <div className="mb-1.5 text-[11px] font-semibold">ESA WorldCover 2021 (10 m)</div>
@@ -252,7 +331,6 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
                   <span className="size-2 rounded-full bg-[#fbbf24]" /> fire
                   <span className="size-2 rounded-full bg-[#f43f5e]" /> intense fire (≥20 MW)
                 </div>
-                
               </div>
             )}
           </div>
@@ -271,7 +349,9 @@ export function ForestsView({ initialIso2 }: { initialIso2: string }) {
             </a>
           )}
           <span>ESA WorldCover via Microsoft Planetary Computer</span>
-          <Badge>Fires updated {profile.data.fires ? new Date(profile.data.fires.fetchedAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "—"}</Badge>
+          <Badge>
+            Fires updated {profile.data.fires ? new Date(profile.data.fires.fetchedAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "—"}
+          </Badge>
         </div>
       )}
     </>

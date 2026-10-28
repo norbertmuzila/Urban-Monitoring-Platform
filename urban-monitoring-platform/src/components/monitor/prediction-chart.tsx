@@ -33,7 +33,7 @@ export function PredictionChart({
   const pad = <T,>(before: number, values: T[], after = 0) => [...Array(before).fill(null), ...values, ...Array(after).fill(null)];
   const nh = history.length;
   // Join the forecast lines to the last observation so the curves are continuous.
-  const last = history.at(-1)?.observed ?? null;
+  const last = history.length ? (history[history.length - 1].observed ?? null) : null;
 
   return (
     <Line

@@ -21,10 +21,10 @@ function LiveClock() {
   const second = useSyncExternalStore(subscribeSeconds, currentSecond, () => null);
   const now = second != null ? new Date(second * 1000) : null;
   return (
-    <span className="hidden items-center gap-2 rounded-lg border border-line bg-surface-2/60 px-3 py-1.5 font-mono text-xs text-muted tabular-nums sm:inline-flex">
+    <span translate="no" className="hidden items-center gap-2 rounded-lg border border-line bg-surface-2/60 px-3 py-1.5 font-mono text-xs text-muted tabular-nums sm:inline-flex">
       <Clock className="size-3.5" strokeWidth={2} aria-hidden />
       {now ? now.toLocaleTimeString("en-GB") : "--:--:--"}
-      <span className="text-subtle">{now ? Intl.DateTimeFormat().resolvedOptions().timeZone.split("/").pop()?.replace("_", " ") : ""}</span>
+      <span className="text-subtle">{now ? (Intl.DateTimeFormat().resolvedOptions().timeZone ?? "").split("/").pop()?.replace("_", " ") : ""}</span>
     </span>
   );
 }

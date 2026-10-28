@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { CircleMarker, GeoJSON, MapContainer, Pane, Popup, TileLayer, useMap, ZoomControl } from "react-leaflet";
 import type { DistrictShapes, FirePoints, SitePoints } from "@/lib/client/api";
 import { BASEMAPS, type BasemapId } from "@/components/maps/basemaps";
+import { moveToBounds } from "@/components/maps/safe-move";
 import type { EoTileSource } from "@/components/eo/eo-map-canvas";
 
 const ZIMBABWE_BOUNDS: L.LatLngBoundsExpression = [
@@ -26,9 +27,8 @@ function FitSelection({ bbox }: { bbox: [number, number, number, number] | null 
       return;
     }
     first.current = false;
-    map.stop();
-    if (bbox) map.flyToBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]], { padding: [30, 30], duration: 1.1, maxZoom: 11 });
-    else map.flyToBounds(ZIMBABWE_BOUNDS, { duration: 1.1 });
+    if (bbox) moveToBounds(map, [[bbox[1], bbox[0]], [bbox[3], bbox[2]]], { padding: [30, 30], duration: 1.1, maxZoom: 11 });
+    else moveToBounds(map, ZIMBABWE_BOUNDS, { duration: 1.1 });
   }, [map, bbox]);
   return null;
 }

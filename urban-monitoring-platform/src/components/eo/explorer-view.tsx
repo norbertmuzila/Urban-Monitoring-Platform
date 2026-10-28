@@ -17,6 +17,7 @@ import { BASEMAP_OPTIONS, type BasemapId } from "@/components/maps/basemaps";
 import { EoLegendView } from "./eo-legend";
 import type { EoTileSource, MapView } from "./eo-map-canvas";
 import { ZIMBABWE_PLACES, type Place } from "./places";
+import { PanelBoundary } from "@/components/ui/panel-boundary";
 
 const EoMapCanvas = dynamic(() => import("./eo-map-canvas"), { ssr: false, loading: () => <Skeleton className="size-full rounded-none" /> });
 
@@ -69,7 +70,9 @@ export function ExplorerView({ initial }: { initial: ExplorerInitial }) {
 
   const places: Place[] = useMemo(
     () => [
-      ...[location, ...recent.filter((r) => r.id !== location.id)].slice(0, 6).map((c) => ({ id: `loc-${c.id}`, label: c.name, hint: c.country, lat: c.lat, lng: c.lng, zoom: 12, iso2: c.iso2.toLowerCase() })),
+      ...[location, ...recent.filter((r) => r.id !== location.id)]
+        .slice(0, 6)
+        .map((c) => ({ id: `loc-${c.id}`, label: c.name, hint: c.country, lat: c.lat, lng: c.lng, zoom: 12, iso2: c.iso2.toLowerCase() })),
       // Skip presets that duplicate one of the viewer's recent places.
       ...ZIMBABWE_PLACES.filter((p) => !recent.some((r) => r.name === p.label) && p.label !== location.name),
     ],
@@ -142,7 +145,11 @@ export function ExplorerView({ initial }: { initial: ExplorerInitial }) {
           </Card>
 
           <Card>
-            <CardHeader icon={CalendarDays} title="Time window" subtitle={temporal ? `Clearest scenes between ${fmtDate(shift(end, -days))} and ${fmtDate(end)}` : "Fixed-vintage product"} />
+            <CardHeader
+              icon={CalendarDays}
+              title="Time window"
+              subtitle={temporal ? `Clearest scenes between ${fmtDate(shift(end, -days))} and ${fmtDate(end)}` : "Fixed-vintage product"}
+            />
             <CardBody className="space-y-3">
               <label className="flex items-center justify-between gap-3 text-xs text-muted">
                 End date
@@ -169,7 +176,14 @@ export function ExplorerView({ initial }: { initial: ExplorerInitial }) {
                   <input type="checkbox" checked={compare} disabled={!temporal} onChange={(e) => setCompare(e.target.checked)} className="accent-[var(--color-accent)]" />
                   <ArrowLeftRight className="size-3.5 text-accent" aria-hidden /> Compare with
                 </label>
-                <Segmented label="Compare offset" size="xs" value={offset} onChange={setOffset} options={COMPARE_OFFSETS} className={cn(!(compare && temporal) && "pointer-events-none opacity-40")} />
+                <Segmented
+                  label="Compare offset"
+                  size="xs"
+                  value={offset}
+                  onChange={setOffset}
+                  options={COMPARE_OFFSETS}
+                  className={cn(!(compare && temporal) && "pointer-events-none opacity-40")}
+                />
               </div>
               <label className="flex items-center gap-3 text-xs text-muted">
                 Opacity
@@ -207,19 +221,25 @@ export function ExplorerView({ initial }: { initial: ExplorerInitial }) {
         {/* ---------------------------------------------------------------- map */}
         <div className="order-1 space-y-4 xl:order-2">
           <div ref={mapBox} className="relative h-[62dvh] min-h-[440px] overflow-hidden rounded-[var(--radius-card)] border border-line xl:h-[calc(100dvh-14rem)]">
-            <EoMapCanvas
-              basemap={basemap}
-              target={target}
-              after={toSource(after.data)}
-              before={compare && temporal ? toSource(before.data) : null}
-              ratio={ratio}
-              opacity={opacity}
-              onView={setView}
-            />
+            <PanelBoundary label="The map" className="size-full">
+              <EoMapCanvas
+                basemap={basemap}
+                target={target}
+                after={toSource(after.data)}
+                before={compare && temporal ? toSource(before.data) : null}
+                ratio={ratio}
+                opacity={opacity}
+                onView={setView}
+              />
+            </PanelBoundary>
 
             <div className="pointer-events-none absolute inset-x-3 top-3 z-[1000] flex flex-wrap items-start justify-between gap-2">
               <span className="pointer-events-auto inline-flex items-center gap-2 rounded-lg border border-line-strong bg-surface/95 px-3 py-1.5 text-xs font-medium backdrop-blur">
-                {after.isLoading ? <LoaderCircle className="size-3.5 animate-spin text-accent" aria-hidden /> : <SatelliteDish className="size-3.5 text-accent" aria-hidden />}
+                {after.isLoading ? (
+                  <LoaderCircle className="size-3.5 animate-spin text-accent" aria-hidden />
+                ) : (
+                  <SatelliteDish className="size-3.5 text-accent" aria-hidden />
+                )}
                 {layer?.label ?? "…"}
                 {after.error && <span className="text-subtle">· refreshing</span>}
               </span>
@@ -256,7 +276,12 @@ export function ExplorerView({ initial }: { initial: ExplorerInitial }) {
             )}
 
             {layer?.legend && (
-              <div className={cn("absolute left-3 z-[1000] w-60 rounded-xl border border-line-strong bg-surface/95 p-3 shadow-lg backdrop-blur", compare && temporal ? "bottom-12" : "bottom-3")}>
+              <div
+                className={cn(
+                  "absolute left-3 z-[1000] w-60 rounded-xl border border-line-strong bg-surface/95 p-3 shadow-lg backdrop-blur",
+                  compare && temporal ? "bottom-12" : "bottom-3",
+                )}
+              >
                 <div className="mb-2 text-[11px] font-semibold">{layer.label}</div>
                 <EoLegendView legend={layer.legend} compact />
               </div>

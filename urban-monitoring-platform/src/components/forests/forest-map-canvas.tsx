@@ -5,14 +5,14 @@ import { useEffect } from "react";
 import { CircleMarker, GeoJSON, MapContainer, Pane, Popup, TileLayer, useMap, ZoomControl } from "react-leaflet";
 import type { CountryFires, CountryShape } from "@/lib/client/api";
 import { BASEMAPS } from "@/components/maps/basemaps";
+import { moveToBounds } from "@/components/maps/safe-move";
 import type { EoTileSource } from "@/components/eo/eo-map-canvas";
 
 function FitCountry({ bbox }: { bbox: [number, number, number, number] | null }) {
   const map = useMap();
   useEffect(() => {
     if (!bbox) return;
-    map.stop();
-    map.flyToBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]], { padding: [20, 20], duration: 1, maxZoom: 9 });
+    moveToBounds(map, [[bbox[1], bbox[0]], [bbox[3], bbox[2]]], { padding: [20, 20], duration: 1, maxZoom: 9 });
   }, [map, bbox]);
   return null;
 }

@@ -20,9 +20,19 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
+/**
+ * Browser page translation (Chrome, Edge, Safari) replaces text nodes behind React's back;
+ * React then throws when it removes or inserts next to a node that is no longer there,
+ * and the whole view fails. These guards make those DOM calls tolerant instead.
+ */
+const DOM_GUARD = `(function(){if(typeof Node!=="function"||!Node.prototype)return;var r=Node.prototype.removeChild;Node.prototype.removeChild=function(c){if(c&&c.parentNode!==this)return c;return r.apply(this,arguments)};var i=Node.prototype.insertBefore;Node.prototype.insertBefore=function(n,ref){if(ref&&ref.parentNode!==this)return i.call(this,n,null);return i.apply(this,arguments)}})();`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable} h-full antialiased`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: DOM_GUARD }} />
+      </head>
       <body className="h-full font-sans">{children}</body>
     </html>
   );

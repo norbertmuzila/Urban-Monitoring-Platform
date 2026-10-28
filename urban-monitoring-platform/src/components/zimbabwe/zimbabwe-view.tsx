@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/ui/stat-card";
 import { BASEMAP_OPTIONS, type BasemapId } from "@/components/maps/basemaps";
 import { DistrictPanel } from "./district-panel";
+import { PanelBoundary } from "@/components/ui/panel-boundary";
 
 const ZwMapCanvas = dynamic(() => import("./zw-map-canvas"), { ssr: false, loading: () => <Skeleton className="size-full rounded-none" /> });
 
@@ -82,7 +83,7 @@ export function ZimbabweView() {
   const eo = useEoTiles(underlay === "none" ? null : underlay, 60, underlayEnd);
 
   const byId = useMemo(() => new Map(overview?.districts.map((d) => [d.id, d])), [overview]);
-  const selected = selectedId ? byId.get(selectedId) ?? null : null;
+  const selected = selectedId ? (byId.get(selectedId) ?? null) : null;
   const m = METRICS.find((x) => x.value === metric)!;
 
   const colorOf = useCallback(
@@ -133,10 +134,42 @@ export function ZimbabweView() {
       )}
 
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <StatCard icon={MapPinned} tone="accent" label="Districts monitored" value={overview?.totals.districts ?? "—"} hint="ZIMSTAT ADM2 · incl. urban councils" loading={!overview} />
-        <StatCard icon={Flame} tone="alert" label="VIIRS fires · 24 h" value={overview?.totals.last24h.toLocaleString("en-GB") ?? "—"} hint={overview?.firms.latestAcquisition ? `Latest pass ${new Date(overview.firms.latestAcquisition).toLocaleString("en-GB", { timeZone: "UTC", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} UTC` : "NOAA-20 375 m"} loading={!overview} />
-        <StatCard icon={Flame} tone="danger" label="VIIRS fires · 7 days" value={overview?.totals.last7d.toLocaleString("en-GB") ?? "—"} hint={top ? `Densest: ${top.name} (${top.firesPer1000km2}/1,000 km²)` : undefined} loading={!overview} />
-        <StatCard icon={Pickaxe} tone="warn" label="Mapped mining sites" value={overview?.totals.miningSites ?? "—"} hint="OpenStreetMap quarries, mines & shafts" loading={!overview} />
+        <StatCard
+          icon={MapPinned}
+          tone="accent"
+          label="Districts monitored"
+          value={overview?.totals.districts ?? "—"}
+          hint="ZIMSTAT ADM2 · incl. urban councils"
+          loading={!overview}
+        />
+        <StatCard
+          icon={Flame}
+          tone="alert"
+          label="VIIRS fires · 24 h"
+          value={overview?.totals.last24h.toLocaleString("en-GB") ?? "—"}
+          hint={
+            overview?.firms.latestAcquisition
+              ? `Latest pass ${new Date(overview.firms.latestAcquisition).toLocaleString("en-GB", { timeZone: "UTC", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} UTC`
+              : "NOAA-20 375 m"
+          }
+          loading={!overview}
+        />
+        <StatCard
+          icon={Flame}
+          tone="danger"
+          label="VIIRS fires · 7 days"
+          value={overview?.totals.last7d.toLocaleString("en-GB") ?? "—"}
+          hint={top ? `Densest: ${top.name} (${top.firesPer1000km2}/1,000 km²)` : undefined}
+          loading={!overview}
+        />
+        <StatCard
+          icon={Pickaxe}
+          tone="warn"
+          label="Mapped mining sites"
+          value={overview?.totals.miningSites ?? "—"}
+          hint="OpenStreetMap quarries, mines & shafts"
+          loading={!overview}
+        />
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[1fr_400px]">
@@ -146,16 +179,22 @@ export function ZimbabweView() {
             <Segmented label="Basemap" size="xs" value={basemap} onChange={setBasemap} options={BASEMAP_OPTIONS} />
           </div>
           <div className="relative h-[62dvh] min-h-[460px] overflow-hidden rounded-[var(--radius-card)] border border-line">
-            <ZwMapCanvas
-              basemap={basemap}
-              shapes={shapes}
-              colorOf={colorOf}
-              selected={selected ? { id: selected.id, bbox: selected.bbox } : null}
-              onSelect={setSelectedId}
-              fires={showFires ? fires.data : undefined}
-              sites={showSites ? sites.data : undefined}
-              underlay={eo.data ? { url: eo.data.tileUrl, maxNativeZoom: eo.data.maxNativeZoom, minZoom: eo.data.layer.minZoom ?? 0, attribution: eo.data.layer.attribution } : null}
-            />
+            <PanelBoundary label="The map" className="size-full">
+              <ZwMapCanvas
+                basemap={basemap}
+                shapes={shapes}
+                colorOf={colorOf}
+                selected={selected ? { id: selected.id, bbox: selected.bbox } : null}
+                onSelect={setSelectedId}
+                fires={showFires ? fires.data : undefined}
+                sites={showSites ? sites.data : undefined}
+                underlay={
+                  eo.data
+                    ? { url: eo.data.tileUrl, maxNativeZoom: eo.data.maxNativeZoom, minZoom: eo.data.layer.minZoom ?? 0, attribution: eo.data.layer.attribution }
+                    : null
+                }
+              />
+            </PanelBoundary>
 
             <div className="absolute top-3 right-3 z-[1000] w-52 space-y-1 rounded-xl border border-line-strong bg-surface/95 p-2.5 text-xs shadow-lg backdrop-blur">
               <div className="mb-1 flex items-center gap-1.5 font-semibold">
@@ -219,7 +258,9 @@ export function ZimbabweView() {
 
         <div className="xl:pt-11">
           {selected ? (
-            <DistrictPanel key={selected.id} id={selected.id} name={selected.name} onClose={() => setSelectedId(null)} />
+            <PanelBoundary label="The district screening">
+              <DistrictPanel key={selected.id} id={selected.id} name={selected.name} onClose={() => setSelectedId(null)} />
+            </PanelBoundary>
           ) : (
             <Card className="flex h-full flex-col">
               <CardHeader icon={ShieldAlert} title="Highest fire density · 7 days" subtitle="Select a district for its satellite screening" />
@@ -274,7 +315,9 @@ export function ZimbabweView() {
             <table className="w-full min-w-[640px] text-xs">
               <thead>
                 <tr className="text-left text-[10px] tracking-wider text-subtle uppercase">
-                  <Th {...th} k="name">District</Th>
+                  <Th {...th} k="name">
+                    District
+                  </Th>
                   <Th {...th} k="areaKm2" right>
                     Area km²
                   </Th>
@@ -318,7 +361,6 @@ export function ZimbabweView() {
           )}
         </CardBody>
       </Card>
-
     </>
   );
 }
